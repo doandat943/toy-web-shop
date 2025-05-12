@@ -23,6 +23,29 @@
             .col-image {
                 width: 100%;
                 border-left: none;
+                
+                .upload-image-box {
+                    .upload-buttons {
+                        display: flex;
+                        align-items: flex-start;
+                        
+                        .url-upload-button {
+                            height: 104px;
+                            border-radius: 8px;
+                            border: 1px dashed #d9d9d9;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            width: 104px;
+                            
+                            &:hover {
+                                border-color: #1890ff;
+                                color: #1890ff;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

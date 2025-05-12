@@ -1,4 +1,7 @@
 const fs = require("fs");
+const fetch = require('node-fetch');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const Product = require('../models/product');
 const Product_Variant = require('../models/product_variant');
@@ -6,12 +9,32 @@ const Product_Image = require('../models/product_image');
 const Product_Price_History = require('../models/product_price_history');
 const { uploadProductImages } = require('../midlewares/uploadImage');
 
+// Function to download image from URL and save it
+const downloadImage = async (url, imagePath, fileName) => {
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${response.statusText}`);
+        }
+        
+        const buffer = await response.buffer();
+        fs.writeFileSync(path.join(imagePath, fileName), buffer);
+        
+        return fileName;
+    } catch (error) {
+        console.error('Error downloading image:', error);
+        throw error;
+    }
+};
+
 let create = async (req, res, next) => {
     uploadProductImages(req, res, async (err) => {
         if (err) {
             console.log(err);
             return res.status(400).send(err);
         }
+        
         let quantity = parseInt(req.body.quantity);
         if (quantity === undefined) return res.status(400).send('Trường quantity không tồn tại');
         let product_id = parseInt(req.body.product_id);
@@ -20,8 +43,20 @@ let create = async (req, res, next) => {
         if (colour_id === undefined) return res.status(400).send('Trường colour_id không tồn tại');
         let size_id = parseInt(req.body.size_id);
         if (size_id === undefined) return res.status(400).send('Trường size_id không tồn tại');
-        let files = req.files;
-        if (files === undefined) return res.status(400).send('Trường files không tồn tại');
+        
+        // Get uploaded files
+        let files = req.files || [];
+        
+        // Get image URLs (if any)
+        let imageUrls = [];
+        if (req.body.imageUrls) {
+            try {
+                imageUrls = JSON.parse(req.body.imageUrls);
+            } catch (error) {
+                console.error('Error parsing imageUrls:', error);
+                imageUrls = [];
+            }
+        }
 
         try {
             let data = {
@@ -31,6 +66,8 @@ let create = async (req, res, next) => {
                 size_id
             };
             let newProductVariant = await Product_Variant.create(data);
+            
+            // Process uploaded files
             for (let file of files) {
                 let data = {
                     path: 'http://localhost:8080/static/images/' + file.filename,
@@ -38,6 +75,33 @@ let create = async (req, res, next) => {
                 }
                 let newProductImage = await Product_Image.create(data);
             }
+            
+            // Process image URLs
+            const imagePath = './src/public/images';
+            for (let url of imageUrls) {
+                try {
+                    // Generate unique filename for URL image
+                    let fileExtension = '.jpg';
+                    if (url.toLowerCase().endsWith('.png')) fileExtension = '.png';
+                    if (url.toLowerCase().endsWith('.gif')) fileExtension = '.gif';
+                    
+                    const fileName = `url_${uuidv4()}${fileExtension}`;
+                    
+                    // Download image from URL
+                    await downloadImage(url, imagePath, fileName);
+                    
+                    // Create image record
+                    let data = {
+                        path: 'http://localhost:8080/static/images/' + fileName,
+                        product_variant_id: newProductVariant.product_variant_id
+                    }
+                    let newProductImage = await Product_Image.create(data);
+                } catch (error) {
+                    console.error(`Error processing URL ${url}:`, error);
+                    // Continue with other URLs if one fails
+                }
+            }
+            
             return res.send(newProductVariant)
         } catch (err) {
             console.log(err);
@@ -56,8 +120,20 @@ let update = async (req, res, next) => {
         if (product_variant_id === undefined) return res.status(400).send('Trường product_variant_id không tồn tại');
         let quantity = parseInt(req.body.quantity);
         if (quantity === undefined) return res.status(400).send('Trường quantity không tồn tại');
-        let files = req.files;
-        if (files === undefined) return res.status(400).send('Trường files không tồn tại');
+        
+        // Get uploaded files
+        let files = req.files || [];
+        
+        // Get image URLs (if any)
+        let imageUrls = [];
+        if (req.body.imageUrls) {
+            try {
+                imageUrls = JSON.parse(req.body.imageUrls);
+            } catch (error) {
+                console.error('Error parsing imageUrls:', error);
+                imageUrls = [];
+            }
+        }
 
         try {
             let productVariant = await Product_Variant.findOne({
@@ -66,6 +142,7 @@ let update = async (req, res, next) => {
             });
             if (!productVariant) return res.status(400).send('Product Variant này không tồn tại');
 
+            // Process uploaded files
             for (let file of files) {
                 let path = 'http://localhost:8080/static/images/' + file.filename;
                 await Product_Image.create({
@@ -73,16 +150,45 @@ let update = async (req, res, next) => {
                     product_variant_id
                 });
             }
-
-            for (let { image_id, path } of productVariant.Product_Images) {
-                let directoryPath = __basedir + '\\public\\images\\';
-                let fileName = path.split('/').pop();
+            
+            // Process image URLs
+            const imagePath = './src/public/images';
+            for (let url of imageUrls) {
                 try {
-                    fs.unlinkSync(directoryPath + fileName);
-                } catch (err) {
-                    console.log('Could not delete file:', err);
+                    // Generate unique filename for URL image
+                    let fileExtension = '.jpg';
+                    if (url.toLowerCase().endsWith('.png')) fileExtension = '.png';
+                    if (url.toLowerCase().endsWith('.gif')) fileExtension = '.gif';
+                    
+                    const fileName = `url_${uuidv4()}${fileExtension}`;
+                    
+                    // Download image from URL
+                    await downloadImage(url, imagePath, fileName);
+                    
+                    // Create image record
+                    let path = 'http://localhost:8080/static/images/' + fileName;
+                    await Product_Image.create({
+                        path,
+                        product_variant_id
+                    });
+                } catch (error) {
+                    console.error(`Error processing URL ${url}:`, error);
+                    // Continue with other URLs if one fails
                 }
-                await Product_Image.destroy({ where: { image_id } });
+            }
+
+            // Delete existing images if new ones are provided
+            if ((files.length > 0 || imageUrls.length > 0) && productVariant.Product_Images.length > 0) {
+                for (let { image_id, path } of productVariant.Product_Images) {
+                    let directoryPath = __basedir + '\\public\\images\\';
+                    let fileName = path.split('/').pop();
+                    try {
+                        fs.unlinkSync(directoryPath + fileName);
+                    } catch (err) {
+                        console.log('Could not delete file:', err);
+                    }
+                    await Product_Image.destroy({ where: { image_id } });
+                }
             }
 
             await productVariant.update({ quantity });
@@ -92,7 +198,7 @@ let update = async (req, res, next) => {
             console.log(err);
             return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
         }
-    });
+    })
 }
 
 let onState = async (req, res, next) => {
@@ -210,6 +316,43 @@ let detailCustomerSide = async (req, res, next) => {
     }
 }
 
+let getDetail = async (req, res, next) => {
+    let {product_id, colour_id, size_id} = req.params;
+    product_id = parseInt(product_id);
+    colour_id = parseInt(colour_id);
+    size_id = parseInt(size_id);
+    try {
+        let productVariant = await Product_Variant.findOne({
+            attributes: ['product_variant_id', 'quantity', 'product_id', 'colour_id', 'size_id'],
+            where: {
+                product_id,
+                colour_id,
+                size_id
+            },
+            include: [
+                { model: Product_Image, attributes: ['path']},
+                { model: Product_Price_History, attributes: ['price'], order: [['createdAt', 'DESC']], limit: 1}
+            ]
+        })
+        if(!productVariant) return res.status(400).send("Không tìm thấy biến thể sản phẩm")
+
+        let productVariantTemp = {
+            product_variant_id: productVariant.product_variant_id,
+            quantity: productVariant.quantity,
+            product_id: productVariant.product_id,
+            colour_id: productVariant.colour_id,
+            size_id: productVariant.size_id,
+            price: productVariant.Product_Price_Histories[0].price,
+            product_images: productVariant.Product_Images.map((item) => item.path)
+        }
+        
+        return res.send(productVariantTemp)
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+    }
+}
+
 module.exports = {
     create,
     update,
@@ -217,5 +360,6 @@ module.exports = {
     offState,
     updateQuantity,
     deleteProductVariant,
-    detailCustomerSide
+    detailCustomerSide,
+    getDetail
 };

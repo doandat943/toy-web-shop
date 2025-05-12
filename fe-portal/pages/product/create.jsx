@@ -85,8 +85,25 @@ const CreateProductPage = () => {
                     dataProductVariant.append('colour_id', productVariant.colour_id);
                     dataProductVariant.append('size_id', productVariant.size_id);
                     dataProductVariant.append('quantity', productVariant.quantity);
-                    for (let file of productVariant.fileList)
-                        dataProductVariant.append('product_images', file.originFileObj);
+                    
+                    // Extract URLs from fileList items that have isExternalUrl flag
+                    const imageUrls = [];
+                    
+                    for (let file of productVariant.fileList) {
+                        if (file.isExternalUrl) {
+                            // Add external URL to our URL array
+                            imageUrls.push(file.externalUrl);
+                        } else {
+                            // Add regular file to FormData
+                            dataProductVariant.append('product_images', file.originFileObj);
+                        }
+                    }
+                    
+                    // Add image URLs as JSON string if we have any
+                    if (imageUrls.length > 0) {
+                        dataProductVariant.append('imageUrls', JSON.stringify(imageUrls));
+                    }
+                    
                     let result = await axios.post(
                         `${homeAPI}/product-variant/create`,
                         dataProductVariant,
