@@ -29,6 +29,13 @@ const upload = multer({
     }
 });
 
-const uploadImage = upload.array('product_images', 6);
+// Upload nhiều ảnh sản phẩm (tối đa 6 ảnh)
+const uploadProductImages = upload.array('product_images', 6);
 
-module.exports = uploadImage;
+// Upload một ảnh duy nhất
+const uploadSingleImage = upload.array('image', 1);
+
+module.exports = {
+    uploadProductImages,
+    uploadSingleImage
+};

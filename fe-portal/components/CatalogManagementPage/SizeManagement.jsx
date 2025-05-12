@@ -70,6 +70,69 @@ const SizeManage = () => {
         }
     }
 
+    const handleUpdateSize = async (size) => {
+        const { value: newName } = await Swal.fire({
+            title: 'Cập nhật tên size',
+            input: 'text',
+            inputLabel: '',
+            inputPlaceholder: 'Tên size mới..',
+            inputValue: size.size_name,
+            showCloseButton: true,
+        })
+        if (!newName) {
+            swtoast.fire({
+                text: "Cập nhật size không thành công!"
+            })
+            return
+        }
+        if (newName) {
+            try {
+                await axios.put(homeAPI + '/size/update',
+                    {
+                        size_id: size.size_id,
+                        size_name: newName
+                    })
+                refreshSizetTable()
+                swtoast.success({
+                    text: 'Cập nhật size thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: 'Xảy ra lỗi khi cập nhật size vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
+    const handleDeleteSize = async (size) => {
+        const result = await Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc chắn muốn xóa size "${size.size_name}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        })
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${homeAPI}/size/delete/${size.size_id}`)
+                refreshSizetTable()
+                swtoast.success({
+                    text: 'Xóa size thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: e.response?.data || 'Xảy ra lỗi khi xóa size vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
     return (
         <div className="catalog-management-item">
             <Heading title="Tất cả size" />
@@ -84,6 +147,7 @@ const SizeManage = () => {
                             <th>
                                 Tên size
                             </th>
+                            <th className='text-center'>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,6 +157,20 @@ const SizeManage = () => {
                                     <tr key={index}>
                                         <td className='text-center'>{index + 1}</td>
                                         <td>{size.size_name}</td>
+                                        <td className='text-center'>
+                                            <button 
+                                                className='btn btn-warning btn-sm me-2'
+                                                onClick={() => handleUpdateSize(size)}
+                                            >
+                                                Sửa
+                                            </button>
+                                            <button 
+                                                className='btn btn-danger btn-sm'
+                                                onClick={() => handleDeleteSize(size)}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </td>
                                     </tr>
                                 )
                             })

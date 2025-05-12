@@ -4,10 +4,10 @@ const Product = require('../models/product');
 const Product_Variant = require('../models/product_variant');
 const Product_Image = require('../models/product_image');
 const Product_Price_History = require('../models/product_price_history');
-const uploadImage = require('../midlewares/uploadImage');
+const { uploadProductImages } = require('../midlewares/uploadImage');
 
 let create = async (req, res, next) => {
-    uploadImage(req, res, async (err) => {
+    uploadProductImages(req, res, async (err) => {
         if (err) {
             console.log(err);
             return res.status(400).send(err);
@@ -33,7 +33,7 @@ let create = async (req, res, next) => {
             let newProductVariant = await Product_Variant.create(data);
             for (let file of files) {
                 let data = {
-                    path: 'http://localhost:8080/static/images/' + file.path.slice(-40, file.path.length),
+                    path: 'http://localhost:8080/static/images/' + file.filename,
                     product_variant_id: newProductVariant.product_variant_id
                 }
                 let newProductImage = await Product_Image.create(data);
@@ -47,7 +47,7 @@ let create = async (req, res, next) => {
 }
 
 let update = async (req, res, next) => {
-    uploadImage(req, res, async (err) => {
+    uploadProductImages(req, res, async (err) => {
         if (err) {
             console.log(err);
             return res.status(400).send(err);
@@ -67,8 +67,7 @@ let update = async (req, res, next) => {
             if (!productVariant) return res.status(400).send('Product Variant này không tồn tại');
 
             for (let file of files) {
-                fileName = file.path.slice(-40, file.path.length)
-                let path = 'http://localhost:8080/static/images/' + fileName
+                let path = 'http://localhost:8080/static/images/' + file.filename;
                 await Product_Image.create({
                     path,
                     product_variant_id
@@ -76,20 +75,24 @@ let update = async (req, res, next) => {
             }
 
             for (let { image_id, path } of productVariant.Product_Images) {
-                let directoryPath = __basedir + '\\public\\images\\'
-                let fileName = path.slice(-40, path.length)
-                fs.unlinkSync(directoryPath + fileName)
-                await Product_Image.destroy({ where: { image_id } })
+                let directoryPath = __basedir + '\\public\\images\\';
+                let fileName = path.split('/').pop();
+                try {
+                    fs.unlinkSync(directoryPath + fileName);
+                } catch (err) {
+                    console.log('Could not delete file:', err);
+                }
+                await Product_Image.destroy({ where: { image_id } });
             }
 
-            await productVariant.update({ quantity })
+            await productVariant.update({ quantity });
 
-            return res.send({ message: "Cập nhật biến thể sản phẩm thành công!" })
+            return res.send({ message: "Cập nhật biến thể sản phẩm thành công!" });
         } catch (err) {
             console.log(err);
             return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
         }
-    })
+    });
 }
 
 let onState = async (req, res, next) => {

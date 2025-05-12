@@ -7,7 +7,7 @@ import { formatRate } from '@/helpers/format';
 
 const ProductItem = (props) => {
     return (
-        <div className="product-item col-6 col-md-4 col-lg-3 col-xxl">
+        <div className="product-item col-6 col-md-4 col-lg-3 col-xl-2">
             <Link
                 href={{
                     pathname: `/product/${props.product_id}`,
@@ -15,7 +15,15 @@ const ProductItem = (props) => {
                 }}
             >
                 <div className='product-thumbnails position-relative'>
-                    <Image className="img" src={props.img} fill alt={props.name} />
+                    <Image 
+                        className="img" 
+                        src={props.img} 
+                        fill 
+                        sizes="(max-width: 576px) 50vw, (max-width: 768px) 33vw, (max-width: 992px) 25vw, 16vw"
+                        priority={false}
+                        quality={85}
+                        alt={props.name} 
+                    />
                     <div className="position-absolute rate-box">
                         <span className="d-flex justify-content-start align-items-center">
                             <span className="rating d-flex justify-content-start align-items-center">
@@ -45,7 +53,7 @@ const ProductItem = (props) => {
                         query: { colour: props.colour_id }
                     }}
                 >
-                    <h6>{props.name}</h6>
+                    <h6 className="product-name">{props.name}</h6>
                 </Link>
                 <div className="d-flex justify-content-start">
                     <p className="price-after text-danger fw-bold">{props.price}đ</p>

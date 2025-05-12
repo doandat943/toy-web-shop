@@ -9,6 +9,9 @@ const Product_Variant = sequelize.define('product_variant', {
 	product_variant_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 	quantity: { type: DataTypes.INTEGER, defaultValue: 0 },
 	state: { type: DataTypes.BOOLEAN, defaultValue: true },
+	sku: { type: DataTypes.STRING, unique: true },
+	weight: { type: DataTypes.FLOAT },
+	dimensions: { type: DataTypes.STRING },
 }, {
 	timestamps: true,
 	createdAt: 'created_at',

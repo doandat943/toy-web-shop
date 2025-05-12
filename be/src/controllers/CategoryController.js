@@ -1,4 +1,6 @@
 const Category = require('../models/category');
+const Product = require('../models/product');
+const { Op } = require('sequelize');
 
 let createLevel1 = async (req, res, next) => {
     try {
@@ -33,6 +35,63 @@ let createLevel2 = async (req, res, next) => {
     } catch (err) {
         console.log(err)
         return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+    }
+}
+
+let update = async (req, res, next) => {
+    try {
+        let category_id = req.body.category_id;
+        if (category_id === undefined) return res.status(400).send('Trường category_id không tồn tại');
+        let title = req.body.title;
+        if (title === undefined) return res.status(400).send('Trường title không tồn tại');
+        let description = req.body.description;
+        let image = req.body.image;
+
+        let category = await Category.findOne({ where: { category_id } });
+        if (!category) return res.status(404).send('Danh mục không tồn tại');
+
+        // Kiểm tra xem tên mới có bị trùng với danh mục khác không
+        let existingCategory = await Category.findOne({ 
+            where: { 
+                title,
+                category_id: { [Op.ne]: category_id }
+            }
+        });
+        if (existingCategory) return res.status(409).send('Tên danh mục đã tồn tại');
+
+        await category.update({ title, description, image });
+        return res.send(category);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi cập nhật danh mục vui lòng thử lại');
+    }
+}
+
+let remove = async (req, res, next) => {
+    try {
+        let category_id = req.params.category_id;
+        if (!category_id) return res.status(400).send('Trường category_id không tồn tại');
+
+        let category = await Category.findOne({ where: { category_id } });
+        if (!category) return res.status(404).send('Danh mục không tồn tại');
+
+        // Kiểm tra xem có sản phẩm nào thuộc danh mục này không
+        let products = await Product.findAll({ where: { category_id } });
+        if (products.length > 0) {
+            return res.status(400).send('Không thể xóa danh mục này vì có sản phẩm đang sử dụng');
+        }
+
+        // Kiểm tra xem có danh mục con không
+        let childCategories = await Category.findAll({ where: { parent_id: category_id } });
+        if (childCategories.length > 0) {
+            return res.status(400).send('Không thể xóa danh mục này vì có danh mục con');
+        }
+
+        await category.destroy();
+        return res.send('Xóa danh mục thành công');
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi xóa danh mục vui lòng thử lại');
     }
 }
 
@@ -109,6 +168,8 @@ let listLevel1 = async (req, res, next) => {
 module.exports = {
     createLevel1,
     createLevel2,
+    update,
+    remove,
     nestList,
     list,
     listLevel1

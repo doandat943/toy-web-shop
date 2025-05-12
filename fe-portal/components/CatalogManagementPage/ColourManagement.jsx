@@ -70,6 +70,69 @@ const ColourManage = () => {
         }
     }
 
+    const handleUpdateColour = async (colour) => {
+        const { value: newName } = await Swal.fire({
+            title: 'Cập nhật tên màu',
+            input: 'text',
+            inputLabel: '',
+            inputPlaceholder: 'Tên màu mới..',
+            inputValue: colour.colour_name,
+            showCloseButton: true,
+        })
+        if (!newName) {
+            swtoast.fire({
+                text: "Cập nhật màu không thành công!"
+            })
+            return
+        }
+        if (newName) {
+            try {
+                await axios.put(homeAPI + '/colour/update',
+                    {
+                        colour_id: colour.colour_id,
+                        colour_name: newName
+                    })
+                refreshColourTable()
+                swtoast.success({
+                    text: 'Cập nhật màu thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: 'Xảy ra lỗi khi cập nhật màu vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
+    const handleDeleteColour = async (colour) => {
+        const result = await Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc chắn muốn xóa màu "${colour.colour_name}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        })
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${homeAPI}/colour/delete/${colour.colour_id}`)
+                refreshColourTable()
+                swtoast.success({
+                    text: 'Xóa màu thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: e.response?.data || 'Xảy ra lỗi khi xóa màu vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
     return (
         <div className="catalog-management-item">
             <Heading title="Tất cả màu" />
@@ -84,6 +147,7 @@ const ColourManage = () => {
                             <th>
                                 Tên màu
                             </th>
+                            <th className='text-center'>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,6 +157,20 @@ const ColourManage = () => {
                                     <tr key={index}>
                                         <td className='text-center'>{index + 1}</td>
                                         <td>{colour.colour_name}</td>
+                                        <td className='text-center'>
+                                            <button 
+                                                className='btn btn-warning btn-sm me-2'
+                                                onClick={() => handleUpdateColour(colour)}
+                                            >
+                                                Sửa
+                                            </button>
+                                            <button 
+                                                className='btn btn-danger btn-sm'
+                                                onClick={() => handleDeleteColour(colour)}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </td>
                                     </tr>
                                 )
                             })

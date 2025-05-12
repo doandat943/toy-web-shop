@@ -8,8 +8,17 @@ const CarouselFade = ({ imageList }) => {
                 imageList.map((image, index) => {
                     return (
                         <div key={index}>
-                            <div className="position-relative" style={{ paddingTop: '150%' }}>
-                                <Image className="rounded" src={image} fill alt={index} />
+                            <div className="product-carousel-item position-relative" style={{ paddingTop: '100%' }}>
+                                <Image 
+                                    className="rounded" 
+                                    src={image} 
+                                    fill 
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    priority={index === 0}
+                                    quality={90}
+                                    style={{ objectFit: 'contain' }}
+                                    alt={`Product image ${index + 1}`} 
+                                />
                             </div>
                         </div>
                     );

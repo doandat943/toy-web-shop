@@ -1,0 +1,45 @@
+.product-carousel-item {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  overflow: hidden;
+
+  img {
+    object-fit: contain !important;
+    background-color: #f8f8f8;
+  }
+}
+
+// Custom styling for the Ant Design carousel
+.ant-carousel {
+  .slick-dots {
+    li {
+      button {
+        background: #d9d9d9;
+      }
+      &.slick-active {
+        button {
+          background: #1890ff;
+        }
+      }
+    }
+  }
+
+  .slick-prev,
+  .slick-next {
+    color: #000;
+    font-size: 20px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// Add responsive styles
+@media (max-width: 768px) {
+  .product-carousel-item {
+    padding-top: 100% !important;
+  }
+} 

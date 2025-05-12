@@ -2,8 +2,9 @@ import { swalert, swtoast } from '@/mixins/swal.mixin';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaAngleDown, FaShoppingBag } from 'react-icons/fa';
+import axios from 'axios';
 
 import logo from '@/public/img/logo.png';
 import queries from '@/queries';
@@ -11,12 +12,33 @@ import customerService from '@/services/customerService';
 import useCustomerStore from '@/store/customerStore';
 import Login from './login';
 import Register from './register';
+import { homeAPI } from '@/config';
 
 const Header = () => {
     const [isLogInOpen, setIsLogInOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const isLoggedIn = useCustomerStore((state) => state.isLoggedIn);
     const setCustomerLogout = useCustomerStore((state) => state.setCustomerLogout);
+    const [websiteInfo, setWebsiteInfo] = useState(null);
+    const [websiteLogo, setWebsiteLogo] = useState(logo);
+
+    // Fetch website info
+    useEffect(() => {
+        const fetchWebsiteInfo = async () => {
+            try {
+                const response = await axios.get(`${homeAPI}/website-info/info`);
+                setWebsiteInfo(response.data);
+                if (response.data?.website_logo) {
+                    // Set dynamic logo if available
+                    setWebsiteLogo(`${homeAPI}/static${response.data.website_logo}`);
+                }
+            } catch (error) {
+                console.error('Error fetching website info:', error);
+            }
+        };
+
+        fetchWebsiteInfo();
+    }, []);
 
     const { isError, error, data } = useQuery({
         ...queries.categories.list()
@@ -56,13 +78,18 @@ const Header = () => {
             <div className="header w-100 d-flex align-items-center">
                 <div className="logo-box p-2">
                     <Link href="/">
-                        <Image className="logo" src={logo} alt="" />
+                        <Image className="logo" src={websiteLogo} alt={websiteInfo?.website_name || "elevenT"} width={150} height={60} />
                     </Link>
                 </div>
                 <ul className="menu p-2">
                     <li className="menu-item fw-bold text-uppercase position-relative">
                         <Link href="/collections" className="d-flex align-items-center">
                             Tất cả
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/about-us" className="d-flex align-items-center">
+                            Về chúng tôi
                         </Link>
                     </li>
                     {categoryList &&

@@ -9,6 +9,9 @@ const productRouter = require('./product');
 const product_variantRouter = require('./product_variant');
 const order = require('./order');
 const feedback = require('./feedback');
+const about = require('./about');
+const upload = require('./upload');
+const website_info = require('./website_info');
 
 function setRoute(server) {
 
@@ -29,6 +32,12 @@ function setRoute(server) {
     server.use('/api/order', order);
 
     server.use('/api/feedback', feedback);
+
+    server.use('/api/about', about);
+
+    server.use('/api/upload', upload);
+    
+    server.use('/api/website-info', website_info);
 
 }
 

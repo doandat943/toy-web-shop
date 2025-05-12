@@ -5,10 +5,12 @@ const { sequelize } = require('../configs/database');
 const Category = sequelize.define('Category', {
     category_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     title: DataTypes.STRING,
+    description: DataTypes.TEXT,
     level: { type: DataTypes.INTEGER, defaultValue: 1 },
     parent_id: { type: DataTypes.INTEGER, defaultValue: null },
+    image: DataTypes.STRING,
 }, {
-    timestamps : false
+    timestamps: false
 })
 
 module.exports = Category;

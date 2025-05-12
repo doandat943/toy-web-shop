@@ -1,12 +1,30 @@
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { homeAPI } from '../config.jsx';
 
 const Footer = () => {
+    const [websiteInfo, setWebsiteInfo] = useState(null);
+
+    useEffect(() => {
+        const fetchWebsiteInfo = async () => {
+            try {
+                const response = await axios.get(`${homeAPI}/website-info/info`);
+                setWebsiteInfo(response.data);
+            } catch (error) {
+                console.error('Error fetching website info:', error);
+            }
+        };
+
+        fetchWebsiteInfo();
+    }, []);
+
     return (
         <footer className="footer d-none d-md-block">
             <div className="container g-0">
                 <div className="footer-sidebar row g-0">
                     <div className="footer-comment col-lg-4 pe-lg-2">
-                        <h4>ELEVENT lắng nghe bạn!</h4>
+                        <h4>{websiteInfo?.website_name || 'ELEVENT'} lắng nghe bạn!</h4>
                         <p>Chúng tôi luôn trân trọng và mong đợi nhận được mọi ý kiến đóng góp từ
                             khách hàng để có thể nâng cấp trải nghiệm dịch vụ và sản phẩm tốt hơn nữa.</p>
                         <a href='#'>Đóng góp ý kiến</a >
@@ -20,7 +38,7 @@ const Footer = () => {
                                     </div>
                                     <div className='contact-content'>
                                         <span>Hotline</span>
-                                        <p>19003.175737 - <br />026.747.2737<br />(8:30-22:00)</p>
+                                        <p>{websiteInfo?.hotline || '19003.175737 - 026.747.2737'}<br />{websiteInfo?.hotline_hours || '(8:30-22:00)'}</p>
                                     </div>
                                 </div>
                                 <div className='contact-item d-flex align-items-center mb-4 mb-lg-2'>
@@ -29,7 +47,7 @@ const Footer = () => {
                                     </div>
                                     <div className='contact-content'>
                                         <span>Email</span>
-                                        <p>elevent@elevent.cool</p>
+                                        <p>{websiteInfo?.email || 'elevent@elevent.cool'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -37,26 +55,26 @@ const Footer = () => {
                     </div>
                     <div className="footer-social col-lg-4 row g-0 align-items-lg-center justify-content-lg-end mt-md-4 mt-lg-0 ps-lg-2">
                         <div className='social-icon col flex-lg-grow-0'>
-                            <a href='#'><Image src={'/img/footer/iconFacebook.png'} width={48} height={79} alt='icon-facebook' /></a>
+                            <a href={websiteInfo?.facebook_link || '#'}><Image src={'/img/footer/iconFacebook.png'} width={48} height={79} alt='icon-facebook' /></a>
                         </div>
                         <div className='social-icon col flex-lg-grow-0 ms-lg-4'>
-                            <a href='#'><Image src={'/img/footer/iconZalo.png'} width={76} height={91} alt='icon-zalo' /></a>
+                            <a href={websiteInfo?.zalo_link || '#'}><Image src={'/img/footer/iconZalo.png'} width={76} height={91} alt='icon-zalo' /></a>
                         </div>
                         <div className='social-icon col flex-lg-grow-0 ms-lg-4'>
-                            <a href='#'><Image src={'/img/footer/iconTiktok.png'} width={74} height={101} alt='icon-tiktok' /></a>
+                            <a href={websiteInfo?.tiktok_link || '#'}><Image src={'/img/footer/iconTiktok.png'} width={74} height={101} alt='icon-tiktok' /></a>
                         </div>
                         <div className='social-icon col flex-lg-grow-0 ms-lg-4'>
-                            <a href='#'><Image src={'/img/footer/iconInstargram.svg'} width={27} height={30} alt='icon-instargram' /></a>
+                            <a href={websiteInfo?.instagram_link || '#'}><Image src={'/img/footer/iconInstargram.svg'} width={27} height={30} alt='icon-instargram' /></a>
                         </div>
                         <div className='social-icon col flex-lg-grow-0 ms-lg-4'>
-                            <a href='#'><Image src={'/img/footer/iconYoutube.svg'} width={34} height={30} alt='icon-youtube' /></a>
+                            <a href={websiteInfo?.youtube_link || '#'}><Image src={'/img/footer/iconYoutube.svg'} width={34} height={30} alt='icon-youtube' /></a>
                         </div>
                     </div>
                 </div>
                 <div className="footer-after row g-0 pt-3">
                     <div className="copyright col col-lg-8 pe-1">
-                        <h5 className='copyright-title'>@ CÔNG TY TNHH NASTECH ASIA</h5>
-                        <p className='copyright-description'>Mã số doanh nghiệp: 0108116083. Giấy chứng nhận đăng ký doanh nghiệp do Sở Kế hoạch và Đầu tư TP Cần Thơ cấp lần đầu ngày 21/03/2017.</p>
+                        <h5 className='copyright-title'>@ {websiteInfo?.company_name || 'CÔNG TY TNHH NASTECH ASIA'}</h5>
+                        <p className='copyright-description'>{websiteInfo?.company_info || 'Mã số doanh nghiệp: 0108116083. Giấy chứng nhận đăng ký doanh nghiệp do Sở Kế hoạch và Đầu tư TP Cần Thơ cấp lần đầu ngày 21/03/2017.'}</p>
                     </div>
                     <div className="logo col col-lg-4 d-flex justify-content-end ps-1">
                         <div className="logo-item d-inline me-3">

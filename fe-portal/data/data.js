@@ -20,4 +20,18 @@ export const menu = [
 
         ],
     },
+    {
+        title: 'Quản lý trang giới thiệu',
+        href: '/about/manage',
+        list: [
+
+        ],
+    },
+    {
+        title: 'Quản lý thông tin website',
+        href: '/website-info/manage',
+        list: [
+
+        ],
+    },
 ]

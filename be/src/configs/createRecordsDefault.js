@@ -1,5 +1,6 @@
 const Role = require('../models/role')
 const Order_State = require('../models/order_state')
+const WebsiteInfo = require('../models/website_info')
 
 module.exports = {
 
@@ -28,6 +29,10 @@ module.exports = {
 
             state6 = await Order_State.findOne({ where: { state_id: 6 } })
             if (state6 == null) await Order_State.create({ state_id: 6, state_name: 'Hủy Bởi Shop' })
+            
+            // Tạo thông tin website mặc định nếu chưa có
+            websiteInfo = await WebsiteInfo.findOne({ order: [['created_at', 'DESC']] })
+            if (websiteInfo == null) await WebsiteInfo.create({})
         } catch (err) {
             console.log(err)
         }

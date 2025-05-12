@@ -1,0 +1,35 @@
+.product-page {
+  padding-bottom: 3rem;
+  
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -8px; // Negative margin for tighter grid
+
+    // Container for each product item
+    .product-item {
+      padding: 8px;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 576px) {
+    .product-list {
+      margin: 0 -5px;
+      
+      .product-item {
+        padding: 5px;
+      }
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .product-list {
+      .product-item {
+        flex: 0 0 16.666667%;
+        max-width: 16.666667%;
+      }
+    }
+  }
+} 

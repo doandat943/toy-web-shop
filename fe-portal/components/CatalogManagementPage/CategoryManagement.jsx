@@ -76,6 +76,69 @@ const Category = () => {
         }
     }
 
+    const handleUpdateCategory = async (category) => {
+        const { value: newTitle } = await Swal.fire({
+            title: 'Cập nhật tên danh mục',
+            input: 'text',
+            inputLabel: '',
+            inputPlaceholder: 'Tên danh mục mới..',
+            inputValue: category.title,
+            showCloseButton: true,
+        })
+        if (!newTitle) {
+            swtoast.fire({
+                text: "Cập nhật danh mục không thành công!"
+            })
+            return
+        }
+        if (newTitle) {
+            try {
+                await axios.put(homeAPI + '/category/update',
+                    {
+                        category_id: category.category_id,
+                        title: newTitle
+                    })
+                refreshCategoryTable()
+                swtoast.success({
+                    text: 'Cập nhật danh mục thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: 'Xảy ra lỗi khi cập nhật danh mục vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
+    const handleDeleteCategory = async (category) => {
+        const result = await Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc chắn muốn xóa danh mục "${category.title}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        })
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${homeAPI}/category/delete/${category.category_id}`)
+                refreshCategoryTable()
+                swtoast.success({
+                    text: 'Xóa danh mục thành công!'
+                })
+            } catch (e) {
+                console.log(e)
+                swtoast.error({
+                    text: e.response?.data || 'Xảy ra lỗi khi xóa danh mục vui lòng thử lại!'
+                })
+            }
+        }
+    }
+
     return (
         <div className="catalog-management-item">
             <Heading title="Tất cả danh mục" />
@@ -95,6 +158,7 @@ const Category = () => {
                             <th>
                                 Danh mục cha
                             </th>
+                            <th className='text-center'>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody >
@@ -106,6 +170,20 @@ const Category = () => {
                                         <td>{category.title}</td>
                                         <td>{category.level}</td>
                                         <td>{category.parent}</td>
+                                        <td className='text-center'>
+                                            <button 
+                                                className='btn btn-warning btn-sm me-2'
+                                                onClick={() => handleUpdateCategory(category)}
+                                            >
+                                                Sửa
+                                            </button>
+                                            <button 
+                                                className='btn btn-danger btn-sm'
+                                                onClick={() => handleDeleteCategory(category)}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </td>
                                     </tr>
                                 )
                             })
