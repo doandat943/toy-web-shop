@@ -4,13 +4,69 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import queries from '@/queries';
+import { useState, useEffect } from 'react';
+import { formatPrice } from '@/helpers/format';
+
+// Sample toy product images for categories
+const toyImages = [
+    "/img/products/toy1.jpg",
+    "/img/products/toy2.jpg",
+    "/img/products/toy3.jpg",
+    "/img/products/toy4.jpg",
+];
+
+// Placeholder image for products with missing images
+const placeholderImage = "/img/products/placeholder.jpg";
 
 export default function HomePage() {
-    const { data: productsData } = useQuery({
-        ...queries.products.list()
+    const { data: productsData, isLoading, isError } = useQuery({
+        ...queries.products.list(),
+        retry: 3, // Try 3 times before showing error
+        staleTime: 5 * 60 * 1000, // 5 minutes
     });
     
-    const products = productsData?.data || [];
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        if (productsData?.data && productsData.data.length > 0) {
+            // Map products to ensure they have image paths
+            const mappedProducts = productsData.data.map((product) => {
+                // Try to get image from various possible properties
+                let imagePath = null;
+                
+                // Check for product_image property
+                if (product.product_image) {
+                    imagePath = product.product_image;
+                } 
+                // Check if product has variants with images
+                else if (product.product_variants && product.product_variants.length > 0) {
+                    const variant = product.product_variants[0];
+                    if (variant.product_images && variant.product_images.length > 0) {
+                        imagePath = variant.product_images[0].path;
+                    }
+                }
+                // Check for a thumbnail property
+                else if (product.thumbnail) {
+                    imagePath = product.thumbnail;
+                }
+                
+                // If no image found, use placeholder
+                if (!imagePath) {
+                    imagePath = placeholderImage;
+                }
+                
+                return {
+                    ...product,
+                    display_image: imagePath
+                };
+            });
+            
+            setProducts(mappedProducts);
+        } else {
+            // Clear products if none are received
+            setProducts([]);
+        }
+    }, [productsData]);
 
     // Toy categories with icons
     const toyCategories = [
@@ -22,10 +78,10 @@ export default function HomePage() {
 
     // Product sections
     const productSections = [
-        { title: "Đồ chơi trí tuệ", href: "/collections" },
-        { title: "Đồ chơi tập nói", href: "/collections" },
-        { title: "Đồ chơi vận động", href: "/collections" },
-        { title: "Sản phẩm nổi bật", href: "/collections" },
+        { title: "Đồ chơi trí tuệ", href: "/collections", filter: (p, i) => i % 4 === 0 },
+        { title: "Đồ chơi tập nói", href: "/collections", filter: (p, i) => i % 4 === 1 },
+        { title: "Đồ chơi vận động", href: "/collections", filter: (p, i) => i % 4 === 2 },
+        { title: "Sản phẩm nổi bật", href: "/collections", filter: (p, i) => i % 4 === 3 },
     ];
 
     // Benefits
@@ -52,6 +108,60 @@ export default function HomePage() {
         }
     ];
 
+    // Display loading or error messages
+    const renderProductContent = (filterFn = null) => {
+        if (isLoading) {
+            return <div className="col-12 text-center py-5">Đang tải sản phẩm...</div>;
+        }
+        
+        if (isError) {
+            return <div className="col-12 text-center py-5">Không thể tải sản phẩm. Vui lòng thử lại sau.</div>;
+        }
+        
+        if (!products || products.length === 0) {
+            return <div className="col-12 text-center py-5">Không có sản phẩm nào.</div>;
+        }
+        
+        // Filter products if a filter function is provided, otherwise take first 4
+        const productsToShow = filterFn 
+            ? products.filter(filterFn).slice(0, 4)
+            : products.slice(0, 4);
+        
+        return productsToShow.map((product, index) => (
+            <div className="col-md-3 mb-4" key={index}>
+                <div className="product-card">
+                    <div className="product-image position-relative">
+                        <Link href={`/product/${product.product_id}`}>
+                            <Image 
+                                src={product.display_image}
+                                alt={product.product_name} 
+                                width={250}
+                                height={250}
+                                className="img-fluid"
+                            />
+                        </Link>
+                        <div className="social-icons">
+                            <span className="icon fb">f</span>
+                            <span className="icon insta">i</span>
+                            <span className="icon cart">c</span>
+                        </div>
+                    </div>
+                    <div className="product-info p-2 text-center">
+                        <h5 className="product-title">
+                            <Link href={`/product/${product.product_id}`}>
+                                {product.product_name}
+                            </Link>
+                        </h5>
+                        <div className="product-price">
+                            <span className="price">{formatPrice(product.price)} đ</span>
+                        </div>
+                        <button className="add-to-cart-btn">Thêm vào giỏ</button>
+                    </div>
+                </div>
+            </div>
+        ));
+    };
+
     return (
         <div className="homepage">
             {/* Main slider */}
@@ -69,42 +179,7 @@ export default function HomePage() {
             <div className="featured-products container py-4">
                 <h2 className="section-title text-center mb-4">Đã đặt niềm tin vững chắc vào website</h2>
                 <div className="row">
-                    {products.slice(0, 4).map((product, index) => (
-                        <div className="col-md-3 mb-4" key={index}>
-                            <div className="product-card">
-                                <div className="product-image position-relative">
-                                    <Link href={`/product/${product.product_id}`}>
-                                        {product.product_image && (
-                                            <Image 
-                                                src={product.product_image} 
-                                                alt={product.product_name} 
-                                                width={250}
-                                                height={250}
-                                                layout="responsive"
-                                                className="img-fluid"
-                                            />
-                                        )}
-                                    </Link>
-                                    <div className="social-icons">
-                                        <span className="icon fb">f</span>
-                                        <span className="icon insta">i</span>
-                                        <span className="icon cart">c</span>
-                                    </div>
-                                </div>
-                                <div className="product-info p-2 text-center">
-                                    <h5 className="product-title">
-                                        <Link href={`/product/${product.product_id}`}>
-                                            {product.product_name}
-                                        </Link>
-                                    </h5>
-                                    <div className="product-price">
-                                        <span className="price">{product.price?.toLocaleString('vi-VN')} đ</span>
-                                    </div>
-                                    <button className="add-to-cart-btn">Thêm vào giỏ</button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                    {renderProductContent()}
                 </div>
             </div>
 
@@ -149,42 +224,7 @@ export default function HomePage() {
                         <Link href={section.href} className="view-all-btn">Xem tất cả</Link>
                     </div>
                     <div className="row">
-                        {products.slice(0, 4).map((product, index) => (
-                            <div className="col-md-3 mb-4" key={index}>
-                                <div className="product-card">
-                                    <div className="product-image position-relative">
-                                        <Link href={`/product/${product.product_id}`}>
-                                            {product.product_image && (
-                                                <Image 
-                                                    src={product.product_image} 
-                                                    alt={product.product_name} 
-                                                    width={250}
-                                                    height={250}
-                                                    layout="responsive"
-                                                    className="img-fluid"
-                                                />
-                                            )}
-                                        </Link>
-                                        <div className="social-icons">
-                                            <span className="icon fb">f</span>
-                                            <span className="icon insta">i</span>
-                                            <span className="icon cart">c</span>
-                                        </div>
-                                    </div>
-                                    <div className="product-info p-2 text-center">
-                                        <h5 className="product-title">
-                                            <Link href={`/product/${product.product_id}`}>
-                                                {product.product_name}
-                                            </Link>
-                                        </h5>
-                                        <div className="product-price">
-                                            <span className="price">{product.price?.toLocaleString('vi-VN')} đ</span>
-                                        </div>
-                                        <button className="add-to-cart-btn">Thêm vào giỏ</button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        {renderProductContent((product, index) => section.filter(product, index))}
                     </div>
                 </div>
             ))}

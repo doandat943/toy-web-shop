@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { memo } from 'react';
 
-import { formatRate } from '@/helpers/format';
+import { formatRate, formatPrice } from '@/helpers/format';
 
 const ProductItem = (props) => {
     return (
@@ -35,15 +35,15 @@ const ProductItem = (props) => {
                             </span>
                         </span>
                     </div>
-                    <div className="size-box position-absolute">
-                        {props.sizes.map((item, index) => {
-                            return (
+                    {props.sizes && props.sizes.length > 0 && (
+                        <div className="size-box position-absolute">
+                            {props.sizes.map((item, index) => (
                                 <span className="size-item d-inline-block text-center" key={index}>
                                     {item}
                                 </span>
-                            );
-                        })}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </Link>
             <div className="infor-product">
@@ -56,7 +56,7 @@ const ProductItem = (props) => {
                     <h6 className="product-name">{props.name}</h6>
                 </Link>
                 <div className="d-flex justify-content-start">
-                    <p className="price-after text-danger fw-bold">{props.price}đ</p>
+                    <p className="price-after text-danger fw-bold">{formatPrice(props.price)}đ</p>
                 </div>
             </div>
         </div>

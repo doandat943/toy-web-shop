@@ -51,20 +51,24 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
         }
 
         try {
-            // Create a unique name based on URL
-            const fileName = `url_image_${Date.now()}`;
+            // Validate the URL format
+            if (!imageUrl.match(/^(http|https):\/\/[^ "]+$/)) {
+                message.error("URL không hợp lệ. Vui lòng nhập URL hợp lệ bắt đầu bằng http:// hoặc https://");
+                return;
+            }
             
             // Add to file list with URL
             let productVariantListClone = [...productVariantList];
             let fileListClone = [...productVariantListClone[index].fileList];
+            
+            const fileName = `url_image_${Date.now()}`;
             
             // Add the URL directly
             fileListClone.push({
                 uid: fileName,
                 name: fileName,
                 status: 'done',
-                url: imageUrl,
-                // Store the URL for backend processing
+                url: imageUrl, // URL for preview
                 isExternalUrl: true,
                 externalUrl: imageUrl
             });
@@ -74,7 +78,7 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
             
             setImageUrl('');
             setIsUrlModalOpen(false);
-            message.success("Đã thêm hình ảnh từ URL");
+            message.success("Đã thêm hình ảnh từ URL (URL sẽ được lưu trực tiếp)");
         } catch (error) {
             console.error("Error adding image from URL:", error);
             message.error("Không thể thêm hình ảnh từ URL");
@@ -147,6 +151,9 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
                 />
                 <div style={{ marginTop: '10px', fontSize: '12px', color: '#888' }}>
                     Lưu ý: URL phải trỏ trực tiếp đến file hình ảnh (jpg, png, gif, webp, v.v.)
+                </div>
+                <div style={{ marginTop: '5px', fontSize: '12px', color: '#1890ff' }}>
+                    <strong>Cập nhật:</strong> URL sẽ được lưu trực tiếp thay vì tải về máy chủ.
                 </div>
             </Modal>
         </div>

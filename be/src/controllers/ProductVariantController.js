@@ -9,7 +9,7 @@ const Product_Image = require('../models/product_image');
 const Product_Price_History = require('../models/product_price_history');
 const { uploadProductImages } = require('../midlewares/uploadImage');
 
-// Function to download image from URL and save it
+// Function to download image from URL and save it - kept for reference
 const downloadImage = async (url, imagePath, fileName) => {
     try {
         const response = await fetch(url);
@@ -52,6 +52,24 @@ const getImageExtension = (url, contentType) => {
     return '.jpg';
 };
 
+// Function to validate image URL
+const validateImageUrl = async (url) => {
+    try {
+        // Try to fetch the URL headers to check if it's a valid image
+        const response = await fetch(url, { method: 'HEAD' });
+        if (!response.ok) {
+            return false;
+        }
+        
+        const contentType = response.headers.get('content-type') || '';
+        // Verify it's an image
+        return contentType.startsWith('image/');
+    } catch (error) {
+        console.error(`URL validation error:`, error);
+        return false;
+    }
+};
+
 let create = async (req, res, next) => {
     uploadProductImages(req, res, async (err) => {
         if (err) {
@@ -91,26 +109,19 @@ let create = async (req, res, next) => {
             };
             let newProductVariant = await Product_Variant.create(data);
             
-            // Process image URLs first (prioritize URL-based images)
-            const imagePath = './src/public/images';
+            // Process image URLs - simply store the URL directly
             for (let url of imageUrls) {
                 try {
-                    // Fetch the URL to check content type
-                    const response = await fetch(url, { method: 'HEAD' });
-                    const contentType = response.headers.get('content-type') || '';
+                    // Optional: Validate the URL is actually an image
+                    const isValid = await validateImageUrl(url);
+                    if (!isValid) {
+                        console.log(`URL không hợp lệ hoặc không phải hình ảnh: ${url}`);
+                        continue;
+                    }
                     
-                    // Get appropriate extension
-                    const fileExtension = getImageExtension(url, contentType);
-                    
-                    // Generate unique filename for URL image
-                    const fileName = `url_${uuidv4()}${fileExtension}`;
-                    
-                    // Download image from URL
-                    await downloadImage(url, imagePath, fileName);
-                    
-                    // Create image record
+                    // Create image record using the URL directly
                     let data = {
-                        path: 'http://localhost:8080/static/images/' + fileName,
+                        path: url, // Store URL directly
                         product_variant_id: newProductVariant.product_variant_id
                     }
                     let newProductImage = await Product_Image.create(data);
@@ -172,38 +183,33 @@ let update = async (req, res, next) => {
             // Delete existing images if new ones are provided
             if ((files.length > 0 || imageUrls.length > 0) && productVariant.Product_Images.length > 0) {
                 for (let { image_id, path } of productVariant.Product_Images) {
-                    let directoryPath = __basedir + '\\public\\images\\';
-                    let fileName = path.split('/').pop();
-                    try {
-                        fs.unlinkSync(directoryPath + fileName);
-                    } catch (err) {
-                        console.log('Could not delete file:', err);
+                    // Only delete local files, not URLs
+                    if (path.includes('http://localhost:8080/static/images/')) {
+                        let directoryPath = __basedir + '\\public\\images\\';
+                        let fileName = path.split('/').pop();
+                        try {
+                            fs.unlinkSync(directoryPath + fileName);
+                        } catch (err) {
+                            console.log('Could not delete file:', err);
+                        }
                     }
                     await Product_Image.destroy({ where: { image_id } });
                 }
             }
             
-            // Process image URLs first (prioritize URL-based images)
-            const imagePath = './src/public/images';
+            // Process image URLs - simply store the URL directly
             for (let url of imageUrls) {
                 try {
-                    // Fetch the URL to check content type
-                    const response = await fetch(url, { method: 'HEAD' });
-                    const contentType = response.headers.get('content-type') || '';
+                    // Optional: Validate the URL is actually an image
+                    const isValid = await validateImageUrl(url);
+                    if (!isValid) {
+                        console.log(`URL không hợp lệ hoặc không phải hình ảnh: ${url}`);
+                        continue;
+                    }
                     
-                    // Get appropriate extension
-                    const fileExtension = getImageExtension(url, contentType);
-                    
-                    // Generate unique filename for URL image
-                    const fileName = `url_${uuidv4()}${fileExtension}`;
-                    
-                    // Download image from URL
-                    await downloadImage(url, imagePath, fileName);
-                    
-                    // Create image record
-                    let path = 'http://localhost:8080/static/images/' + fileName;
+                    // Create image record using the URL directly
                     await Product_Image.create({
-                        path,
+                        path: url, // Store URL directly
                         product_variant_id
                     });
                 } catch (error) {
