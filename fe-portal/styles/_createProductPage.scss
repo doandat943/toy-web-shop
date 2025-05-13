@@ -27,22 +27,32 @@
                 .upload-image-box {
                     .upload-buttons {
                         display: flex;
+                        flex-direction: column;
                         align-items: flex-start;
                         
                         .url-upload-button {
-                            height: 104px;
+                            margin-bottom: 15px;
+                            height: 44px;
                             border-radius: 8px;
-                            border: 1px dashed #d9d9d9;
+                            border: 1px dashed #1890ff;
                             display: flex;
                             flex-direction: column;
                             justify-content: center;
                             align-items: center;
-                            width: 104px;
+                            width: 100%;
+                            color: #1890ff;
+                            font-weight: 500;
+                            background-color: rgba(24, 144, 255, 0.05);
                             
                             &:hover {
-                                border-color: #1890ff;
-                                color: #1890ff;
+                                color: #40a9ff;
+                                border-color: #40a9ff;
+                                background-color: rgba(24, 144, 255, 0.1);
                             }
+                        }
+
+                        .ant-upload-list {
+                            width: 100%;
                         }
                     }
                 }

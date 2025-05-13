@@ -28,6 +28,30 @@ const downloadImage = async (url, imagePath, fileName) => {
     }
 };
 
+// Function to detect image type from response headers or URL
+const getImageExtension = (url, contentType) => {
+    // Try to get extension from content type
+    if (contentType) {
+        if (contentType.includes('jpeg') || contentType.includes('jpg')) return '.jpg';
+        if (contentType.includes('png')) return '.png';
+        if (contentType.includes('gif')) return '.gif';
+        if (contentType.includes('webp')) return '.webp';
+        if (contentType.includes('svg')) return '.svg';
+    }
+    
+    // Try to get extension from URL
+    if (url.includes('.')) {
+        const urlParts = url.split('.');
+        const ext = urlParts[urlParts.length - 1].split('?')[0]; // Remove query params
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext.toLowerCase())) {
+            return `.${ext.toLowerCase()}`;
+        }
+    }
+    
+    // Default to jpg if can't determine
+    return '.jpg';
+};
+
 let create = async (req, res, next) => {
     uploadProductImages(req, res, async (err) => {
         if (err) {
@@ -67,24 +91,18 @@ let create = async (req, res, next) => {
             };
             let newProductVariant = await Product_Variant.create(data);
             
-            // Process uploaded files
-            for (let file of files) {
-                let data = {
-                    path: 'http://localhost:8080/static/images/' + file.filename,
-                    product_variant_id: newProductVariant.product_variant_id
-                }
-                let newProductImage = await Product_Image.create(data);
-            }
-            
-            // Process image URLs
+            // Process image URLs first (prioritize URL-based images)
             const imagePath = './src/public/images';
             for (let url of imageUrls) {
                 try {
-                    // Generate unique filename for URL image
-                    let fileExtension = '.jpg';
-                    if (url.toLowerCase().endsWith('.png')) fileExtension = '.png';
-                    if (url.toLowerCase().endsWith('.gif')) fileExtension = '.gif';
+                    // Fetch the URL to check content type
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const contentType = response.headers.get('content-type') || '';
                     
+                    // Get appropriate extension
+                    const fileExtension = getImageExtension(url, contentType);
+                    
+                    // Generate unique filename for URL image
                     const fileName = `url_${uuidv4()}${fileExtension}`;
                     
                     // Download image from URL
@@ -100,6 +118,15 @@ let create = async (req, res, next) => {
                     console.error(`Error processing URL ${url}:`, error);
                     // Continue with other URLs if one fails
                 }
+            }
+            
+            // Process uploaded files
+            for (let file of files) {
+                let data = {
+                    path: 'http://localhost:8080/static/images/' + file.filename,
+                    product_variant_id: newProductVariant.product_variant_id
+                }
+                let newProductImage = await Product_Image.create(data);
             }
             
             return res.send(newProductVariant)
@@ -142,24 +169,32 @@ let update = async (req, res, next) => {
             });
             if (!productVariant) return res.status(400).send('Product Variant này không tồn tại');
 
-            // Process uploaded files
-            for (let file of files) {
-                let path = 'http://localhost:8080/static/images/' + file.filename;
-                await Product_Image.create({
-                    path,
-                    product_variant_id
-                });
+            // Delete existing images if new ones are provided
+            if ((files.length > 0 || imageUrls.length > 0) && productVariant.Product_Images.length > 0) {
+                for (let { image_id, path } of productVariant.Product_Images) {
+                    let directoryPath = __basedir + '\\public\\images\\';
+                    let fileName = path.split('/').pop();
+                    try {
+                        fs.unlinkSync(directoryPath + fileName);
+                    } catch (err) {
+                        console.log('Could not delete file:', err);
+                    }
+                    await Product_Image.destroy({ where: { image_id } });
+                }
             }
             
-            // Process image URLs
+            // Process image URLs first (prioritize URL-based images)
             const imagePath = './src/public/images';
             for (let url of imageUrls) {
                 try {
-                    // Generate unique filename for URL image
-                    let fileExtension = '.jpg';
-                    if (url.toLowerCase().endsWith('.png')) fileExtension = '.png';
-                    if (url.toLowerCase().endsWith('.gif')) fileExtension = '.gif';
+                    // Fetch the URL to check content type
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const contentType = response.headers.get('content-type') || '';
                     
+                    // Get appropriate extension
+                    const fileExtension = getImageExtension(url, contentType);
+                    
+                    // Generate unique filename for URL image
                     const fileName = `url_${uuidv4()}${fileExtension}`;
                     
                     // Download image from URL
@@ -177,18 +212,13 @@ let update = async (req, res, next) => {
                 }
             }
 
-            // Delete existing images if new ones are provided
-            if ((files.length > 0 || imageUrls.length > 0) && productVariant.Product_Images.length > 0) {
-                for (let { image_id, path } of productVariant.Product_Images) {
-                    let directoryPath = __basedir + '\\public\\images\\';
-                    let fileName = path.split('/').pop();
-                    try {
-                        fs.unlinkSync(directoryPath + fileName);
-                    } catch (err) {
-                        console.log('Could not delete file:', err);
-                    }
-                    await Product_Image.destroy({ where: { image_id } });
-                }
+            // Process uploaded files
+            for (let file of files) {
+                let path = 'http://localhost:8080/static/images/' + file.filename;
+                await Product_Image.create({
+                    path,
+                    product_variant_id
+                });
             }
 
             await productVariant.update({ quantity });

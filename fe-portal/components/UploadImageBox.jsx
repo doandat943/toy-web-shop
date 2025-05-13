@@ -44,18 +44,9 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
         setImageUrl(e.target.value);
     };
 
-    const validateImageUrl = (url) => {
-        return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
-    };
-
     const addImageFromUrl = async () => {
         if (!imageUrl) {
             message.error("Vui lòng nhập URL hình ảnh");
-            return;
-        }
-
-        if (!validateImageUrl(imageUrl)) {
-            message.error("URL không hợp lệ. Hãy nhập URL hình ảnh (jpg, png, gif, jpeg)");
             return;
         }
 
@@ -102,6 +93,24 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
     return (
         <div className="upload-image-box">
             <div className="upload-buttons">
+                <Button 
+                    className="url-upload-button" 
+                    icon={<LinkOutlined />} 
+                    onClick={showUrlModal}
+                    style={{ 
+                        marginBottom: '10px',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px dashed #d9d9d9',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%'
+                    }}
+                >
+                    Thêm ảnh từ URL
+                </Button>
+                
                 <Upload
                     listType="picture-card"
                     fileList={productVariantList[index].fileList}
@@ -111,19 +120,6 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
                 >
                     {productVariantList[index].fileList && productVariantList[index].fileList.length >= 6 ? null : uploadButton}
                 </Upload>
-                
-                {productVariantList[index].fileList && productVariantList[index].fileList.length < 6 && (
-                    <Tooltip title="Thêm ảnh từ URL">
-                        <Button 
-                            className="url-upload-button" 
-                            icon={<LinkOutlined />} 
-                            onClick={showUrlModal}
-                            style={{ marginLeft: '10px' }}
-                        >
-                            URL
-                        </Button>
-                    </Tooltip>
-                )}
             </div>
             
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
@@ -144,13 +140,13 @@ const UploadImageBox = ({ index, productVariantList, setProductVariantList }) =>
                 ]}
             >
                 <Input
-                    placeholder="Nhập URL hình ảnh (jpg, png, gif, jpeg)"
+                    placeholder="Nhập URL hình ảnh"
                     value={imageUrl}
                     onChange={handleUrlChange}
                     style={{ width: '100%' }}
                 />
                 <div style={{ marginTop: '10px', fontSize: '12px', color: '#888' }}>
-                    Lưu ý: URL phải trỏ trực tiếp đến file hình ảnh và kết thúc bằng .jpg, .png, .gif hoặc .jpeg
+                    Lưu ý: URL phải trỏ trực tiếp đến file hình ảnh (jpg, png, gif, webp, v.v.)
                 </div>
             </Modal>
         </div>

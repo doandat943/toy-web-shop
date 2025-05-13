@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Input, InputNumber, Empty } from 'antd'
+import { Input, InputNumber, Empty, Alert } from 'antd'
 
 import Header from '@/components/Header';
 import Category from '@/components/Category';
@@ -118,6 +118,8 @@ const CreateProductPage = () => {
                 clearPage()
             } catch (err) {
                 console.log(err);
+                setIsLoading(false)
+                swtoast.error({ text: 'Đã xảy ra lỗi khi thêm sản phẩm!' })
             }
         }
     }
@@ -173,6 +175,13 @@ const CreateProductPage = () => {
         <div className='create-product-page'>
             <Header title="Thêm sản phẩm" />
             <div className="create-product-form">
+                <Alert
+                    message="Hướng dẫn thêm ảnh sản phẩm"
+                    description="Bạn có thể thêm ảnh bằng cách nhập URL hình ảnh trực tiếp. Hỗ trợ các định dạng như jpg, png, gif, webp, v.v."
+                    type="info"
+                    showIcon
+                    style={{ marginBottom: '20px' }}
+                />
                 {/* // Input Ten san pham */}
                 <div className="row">
                     <div className="col-6">

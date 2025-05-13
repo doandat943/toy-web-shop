@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Router from 'next/router';
-import { Input, InputNumber, Empty } from 'antd'
+import { Input, InputNumber, Empty, Alert } from 'antd'
 
 import Header from '@/components/Header';
 import Category from '@/components/Category';
@@ -120,16 +120,19 @@ const UpdateProductPage = () => {
             let fileList = []
             for (let { path } of productImages) {
                 try {
-                    let name = path.slice(-40, -4)
-                    let response = await fetch(path)
-                    let blob = await response.blob();
-                    const file = new File([blob], name, { type: blob.type });
+                    // Extract filename from path
+                    let name = path.split('/').pop();
+                    
+                    // Create a file entry that will be recognized by Ant Design's Upload component
                     fileList.push({
                         uid: name,
                         name: name,
+                        status: 'done',
                         url: path,
-                        originFileObj: file
-                    })
+                        // Mark as existing URL - this is important for knowing it's already on server
+                        isExternalUrl: true,
+                        externalUrl: path
+                    });
                 } catch (err) {
                     console.log(err)
                 }
@@ -217,6 +220,7 @@ const UpdateProductPage = () => {
             } catch (err) {
                 console.log(err);
                 setIsLoading(false)
+                swtoast.error({ text: 'Đã xảy ra lỗi khi cập nhật sản phẩm!' })
             }
         }
     }
@@ -261,6 +265,13 @@ const UpdateProductPage = () => {
         <div className='update-product-page'>
             <Header title="Cập nhật sản phẩm" />
             <div className="update-product-form">
+                <Alert
+                    message="Hướng dẫn thêm ảnh sản phẩm"
+                    description="Bạn có thể thêm ảnh bằng cách nhập URL hình ảnh trực tiếp. Hỗ trợ các định dạng như jpg, png, gif, webp, v.v."
+                    type="info"
+                    showIcon
+                    style={{ marginBottom: '20px' }}
+                />
                 {/* // Input Ten san pham */}
                 <div className="row">
                     <div className="col-6">
