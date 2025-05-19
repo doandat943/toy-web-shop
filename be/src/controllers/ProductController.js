@@ -59,35 +59,83 @@ let update = async (req, res, next) => {
 }
 
 let listAdminSide = async (req, res, next) => {
-    let listProductVariant = await Product_Variant.findAll({
-        attributes: ['product_variant_id', 'quantity', 'state', 'created_at'],
-        include: [
-            {
-                model: Product, attributes: ['product_id', 'product_name'],
-                include: { model: Product_Price_History, attributes: ['price'], separate: true, order: [['created_at', 'DESC']] }
-            },
-            { model: Colour, attributes: ['colour_name'] },
-            { model: Size, attributes: ['size_name'] },
-            { model: Product_Image, attributes: ['path'] },
-        ],
-        order: [['created_at', 'DESC']]
-    });
-    listProductVariant = listProductVariant.map((productVariant) => {
-        let newProductVariant = {
-            product_id: productVariant.Product.product_id,
-            product_variant_id: productVariant.product_variant_id,
-            product_name: productVariant.Product.product_name,
-            colour_name: productVariant.Colour.colour_name,
-            size_name: productVariant.Size.size_name,
-            product_image: productVariant.Product_Images[0].path,
-            price: productVariant.Product.Product_Price_Histories[0].price,
-            quantity: productVariant.quantity,
-            state: productVariant.state,
-            created_at: productVariant.created_at
+    try {
+        console.log("Đang tải danh sách sản phẩm phía admin...");
+        
+        let listProductVariant = await Product_Variant.findAll({
+            attributes: ['product_variant_id', 'quantity', 'state', 'created_at'],
+            include: [
+                {
+                    model: Product, attributes: ['product_id', 'product_name'],
+                    include: { model: Product_Price_History, attributes: ['price'], separate: true, order: [['created_at', 'DESC']] }
+                },
+                { model: Colour, attributes: ['colour_name'] },
+                { model: Size, attributes: ['size_name'] },
+                { model: Product_Image, attributes: ['path'] },
+            ],
+            order: [['created_at', 'DESC']]
+        });
+        
+        console.log(`Tìm thấy ${listProductVariant.length} product variants`);
+        
+        // Kiểm tra và xử lý dữ liệu an toàn
+        let safeProductVariants = [];
+        
+        for (const productVariant of listProductVariant) {
+            try {
+                // Kiểm tra các thành phần cần thiết
+                if (!productVariant.Product) {
+                    console.log(`Variant ${productVariant.product_variant_id} thiếu thông tin sản phẩm`);
+                    continue;
+                }
+                
+                if (!productVariant.Colour) {
+                    console.log(`Variant ${productVariant.product_variant_id} thiếu thông tin màu sắc`);
+                    continue;
+                }
+                
+                if (!productVariant.Size) {
+                    console.log(`Variant ${productVariant.product_variant_id} thiếu thông tin kích thước`);
+                    continue;
+                }
+                
+                // Kiểm tra danh sách giá và hình ảnh
+                const priceHistories = productVariant.Product.Product_Price_Histories || [];
+                if (priceHistories.length === 0) {
+                    console.log(`Sản phẩm ${productVariant.Product.product_id} không có lịch sử giá`);
+                }
+                
+                const productImages = productVariant.Product_Images || [];
+                if (productImages.length === 0) {
+                    console.log(`Variant ${productVariant.product_variant_id} không có hình ảnh`);
+                }
+                
+                let newProductVariant = {
+                    product_id: productVariant.Product.product_id,
+                    product_variant_id: productVariant.product_variant_id,
+                    product_name: productVariant.Product.product_name,
+                    colour_name: productVariant.Colour.colour_name,
+                    size_name: productVariant.Size.size_name,
+                    product_image: productImages.length > 0 ? productImages[0].path : '/images/placeholder.jpg',
+                    price: priceHistories.length > 0 ? priceHistories[0].price : 0,
+                    quantity: productVariant.quantity || 0,
+                    state: !!productVariant.state, // Đảm bảo giá trị boolean
+                    created_at: productVariant.created_at
+                };
+                
+                safeProductVariants.push(newProductVariant);
+            } catch (variantError) {
+                console.error(`Lỗi xử lý variant ${productVariant?.product_variant_id}:`, variantError);
+            }
         }
-        return newProductVariant;
-    });
-    return res.send(listProductVariant);
+        
+        console.log(`Đã xử lý an toàn ${safeProductVariants.length} product variants`);
+        return res.status(200).send(safeProductVariants);
+    } catch (err) {
+        console.error("Lỗi khi tải danh sách sản phẩm:", err);
+        console.error("Stack trace:", err.stack);
+        return res.status(500).send('Gặp lỗi khi tải danh sách sản phẩm: ' + err.message);
+    }
 }
 
 let listCustomerSide = async (req, res, next) => {
@@ -97,8 +145,7 @@ let listCustomerSide = async (req, res, next) => {
         whereClause = { category_id }
 
     try {
-
-
+        console.log("Đang tải danh sách sản phẩm cho khách hàng");
         // Lấy danh sách tất cả sản phẩm ưu tiên sản phẩm mới nhất
         let listProduct = await Product.findAll({
             attributes: ['product_id'],
@@ -195,10 +242,18 @@ let detailAdminSide = async (req, res, next) => {
     if (product_id === undefined) return res.status(400).send('Trường product_id không tồn tại');
 
     try {
-        let productDetail = await Product.findOne({
+        console.log(`Đang tìm sản phẩm với ID: ${product_id}`);
+        
+        // Kiểm tra product_id có phải là số hợp lệ
+        if (isNaN(product_id)) {
+            console.log("product_id không phải là số hợp lệ");
+            return res.status(400).send('ID sản phẩm không hợp lệ');
+        }
+        
+        const productDetail = await Product.findOne({
             attributes: ['product_id', 'product_name', 'category_id', 'description'],
             include: [
-                { model: Category, attributes: ['title'] },
+                { model: Category, attributes: ['category_name'] },
                 { model: Product_Price_History, attributes: ['price'], separate: true, order: [['created_at', 'DESC']] },
                 {
                     model: Product_Variant, attributes: ['product_variant_id', 'colour_id', 'size_id', 'quantity'],
@@ -212,35 +267,75 @@ let detailAdminSide = async (req, res, next) => {
             where: { product_id },
         });
 
+        console.log(`Kết quả tìm kiếm sản phẩm ID ${product_id}:`, productDetail ? "Tìm thấy" : "Không tìm thấy");
+
         if (productDetail) {
-            let productVariantList = productDetail.product_variants.map((productVariant) => {
-                let productImages = productVariant.Product_Images.map(({ path }) => { return { path } })
-                return {
-                    product_variant_id: productVariant.product_variant_id,
-                    colour_id: productVariant.colour_id,
-                    colour_name: productVariant.Colour.colour_name,
-                    size_id: productVariant.size_id,
-                    size_name: productVariant.Size.size_name,
-                    quantity: productVariant.quantity,
-                    product_images: productImages
+            try {
+                // Tránh lỗi nếu không có variant hoặc images
+                if (!productDetail.product_variants || !Array.isArray(productDetail.product_variants)) {
+                    console.log(`Sản phẩm ${product_id} không có variants`);
+                    return res.status(200).send({
+                        product_id: productDetail.product_id,
+                        product_name: productDetail.product_name,
+                        category_id: productDetail.category_id,
+                        category_name: productDetail.Category ? productDetail.Category.category_name : '',
+                        price: productDetail.Product_Price_Histories && productDetail.Product_Price_Histories.length > 0 ? 
+                               productDetail.Product_Price_Histories[0].price : 0,
+                        description: productDetail.description,
+                        product_variant_list: []
+                    });
                 }
-            })
-            productDetail = {
-                product_id: productDetail.product_id,
-                product_name: productDetail.product_name,
-                category_id: productDetail.category_id,
-                category_name: productDetail.Category.title,
-                price: productDetail.Product_Price_Histories[0].price,
-                description: productDetail.description,
-                product_variant_list: productVariantList
+                
+                let productVariantList = productDetail.product_variants.map((productVariant) => {
+                    // Kiểm tra dữ liệu variant có đủ không
+                    if (!productVariant || !productVariant.Colour || !productVariant.Size) {
+                        console.log(`Variant ${productVariant?.product_variant_id} thiếu dữ liệu`);
+                        return null;
+                    }
+                    
+                    // Xử lý an toàn cho images
+                    let productImages = [];
+                    if (productVariant.Product_Images && Array.isArray(productVariant.Product_Images)) {
+                        productImages = productVariant.Product_Images.map(image => {
+                            return image ? { path: image.path } : { path: '' };
+                        });
+                    }
+                    
+                    return {
+                        product_variant_id: productVariant.product_variant_id,
+                        colour_id: productVariant.colour_id,
+                        colour_name: productVariant.Colour.colour_name,
+                        size_id: productVariant.size_id,
+                        size_name: productVariant.Size.size_name,
+                        quantity: productVariant.quantity || 0,
+                        product_images: productImages
+                    };
+                }).filter(variant => variant !== null);
+                
+                const responseData = {
+                    product_id: productDetail.product_id,
+                    product_name: productDetail.product_name,
+                    category_id: productDetail.category_id,
+                    category_name: productDetail.Category ? productDetail.Category.category_name : '',
+                    price: productDetail.Product_Price_Histories && productDetail.Product_Price_Histories.length > 0 ? 
+                           productDetail.Product_Price_Histories[0].price : 0,
+                    description: productDetail.description,
+                    product_variant_list: productVariantList
+                };
+                
+                return res.status(200).send(responseData);
+            } catch (variantErr) {
+                console.error("Lỗi xử lý variant:", variantErr);
+                return res.status(500).send('Lỗi khi xử lý dữ liệu variant: ' + variantErr.message);
             }
-            return res.send(productDetail);
         } else {
-            return res.status(400).send('Biến thể sản phẩm này không tồn tại');
+            console.log(`Không tìm thấy sản phẩm với ID ${product_id}`);
+            return res.status(404).send('Sản phẩm này không tồn tại');
         }
     } catch (err) {
-        console.log(err);
-        return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+        console.error("Lỗi chi tiết:", err);
+        console.error("Stack trace:", err.stack);
+        return res.status(500).send('Lỗi khi tải dữ liệu: ' + err.message);
     }
 }
 

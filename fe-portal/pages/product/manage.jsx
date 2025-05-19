@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Empty } from 'antd'
+import { Empty, Spin, Alert } from 'antd'
 import axios from 'axios'
 
 import Header from '@/components/Header'
 import Heading from '@/components/Heading'
 import ProductAdmin from '@/components/ProductManagementPage/ProductAdmin'
 import Router from 'next/router'
+import { swtoast } from "@/mixins/swal.mixin";
 
 // const fakeData = [
 //     {
@@ -27,24 +28,54 @@ import Router from 'next/router'
 // ];
 
 const ProductManagementPage = () => {
-    let [listProductVariant, setListProductVariant] = useState([]);
+    const [listProductVariant, setListProductVariant] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const getListProductVariant = async () => {
-            try {
-                const result = await axios.get('http://localhost:8080/api/product/admin/list')
-                setListProductVariant(result.data)
-            } catch (err) {
-                console.log(err);
-                // setListProductVariant(fakeData);
-            }
-        }
         getListProductVariant();
     }, [])
 
+    const getListProductVariant = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            console.log("Đang tải danh sách sản phẩm...");
+            
+            const result = await axios.get('http://localhost:8080/api/product/admin/list');
+            
+            console.log("Kết quả API:", result.data);
+            
+            if (Array.isArray(result.data)) {
+                setListProductVariant(result.data);
+            } else {
+                console.error("Dữ liệu không đúng định dạng:", result.data);
+                setListProductVariant([]);
+                setError("Dữ liệu sản phẩm không đúng định dạng");
+            }
+        } catch (err) {
+            console.error("Lỗi khi tải sản phẩm:", err);
+            setListProductVariant([]);
+            
+            if (err.response) {
+                // Lỗi từ server với response
+                setError(`Lỗi máy chủ: ${err.response.status} - ${err.response.data || 'Không có thông báo lỗi'}`);
+            } else if (err.request) {
+                // Lỗi không nhận được response
+                setError("Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.");
+            } else {
+                // Lỗi khác
+                setError(`Đã xảy ra lỗi: ${err.message}`);
+            }
+            
+            swtoast.error({ text: 'Lỗi khi tải danh sách sản phẩm. Vui lòng thử lại sau!' });
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const refreshProductVariantTable = async () => {
-        const result = await axios.get('http://localhost:8080/api/product/admin/list')
-        setListProductVariant(result.data)
+        await getListProductVariant();
     }
 
     return (
@@ -57,6 +88,26 @@ const ProductManagementPage = () => {
                     </button>
                 </div>
                 <Heading title="Tất cả sản phẩm" />
+                
+                {error && (
+                    <Alert
+                        message="Lỗi tải dữ liệu"
+                        description={error}
+                        type="error"
+                        showIcon
+                        style={{ marginBottom: '20px' }}
+                        action={
+                            <button 
+                                onClick={getListProductVariant} 
+                                className="btn btn-sm btn-danger"
+                                disabled={loading}
+                            >
+                                Tải lại
+                            </button>
+                        }
+                    />
+                )}
+                
                 <div className="wrapper-product-admin table-responsive">
                     <table className='table product-admin w-100'>
                         <thead className="w-100 align-middle text-center">
@@ -72,33 +123,35 @@ const ProductManagementPage = () => {
                             </tr>
                         </thead>
                     </table>
-                    {
-                        listProductVariant.length ?
-                            listProductVariant.map((productVariant, index) => {
-                                return (
-                                    <ProductAdmin
-                                        key={index}
-                                        product_id={productVariant.product_id}
-                                        product_variant_id={productVariant.product_variant_id}
-                                        product_name={productVariant.product_name}
-                                        product_image={productVariant.product_image}
-                                        colour_name={productVariant.colour_name}
-                                        size_name={productVariant.size_name}
-                                        price={productVariant.price}
-                                        quantity={productVariant.quantity}
-                                        state={productVariant.state}
-                                        created_at={productVariant.created_at}
-                                        refreshProductVariantTable={refreshProductVariantTable}
-                                    />
-                                )
-                            })
-                            :
-                            <table className="table w-100 table-hover align-middle table-bordered" style={{ height: "400px" }}>
-                                <tbody>
-                                    <tr><td colSpan={6}><Empty /></td></tr>
-                                </tbody>
-                            </table>
-                    }
+                    
+                    {loading ? (
+                        <div className="text-center py-5">
+                            <Spin size="large" tip="Đang tải dữ liệu sản phẩm..." />
+                        </div>
+                    ) : listProductVariant.length ? (
+                        listProductVariant.map((productVariant, index) => (
+                            <ProductAdmin
+                                key={index}
+                                product_id={productVariant.product_id}
+                                product_variant_id={productVariant.product_variant_id}
+                                product_name={productVariant.product_name}
+                                product_image={productVariant.product_image}
+                                colour_name={productVariant.colour_name}
+                                size_name={productVariant.size_name}
+                                price={productVariant.price}
+                                quantity={productVariant.quantity}
+                                state={productVariant.state}
+                                created_at={productVariant.created_at}
+                                refreshProductVariantTable={refreshProductVariantTable}
+                            />
+                        ))
+                    ) : (
+                        <table className="table w-100 table-hover align-middle table-bordered" style={{ height: "400px" }}>
+                            <tbody>
+                                <tr><td colSpan={6}><Empty description="Không tìm thấy sản phẩm nào" /></td></tr>
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             </div>
         </div>
