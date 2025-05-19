@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { FaAngleDown, FaShoppingBag, FaChild, FaGift, FaBirthdayCake, FaQuestionCircle } from 'react-icons/fa';
 
-import logo from '@/public/img/logo-toyshop.png';
+import logo from '@/public/img/logo.png';
 import queries from '@/queries';
 import customerService from '@/services/customerService';
 import useCustomerStore from '@/store/customerStore';

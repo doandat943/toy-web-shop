@@ -1,0 +1,239 @@
+.gift-finder-page {
+    padding-top: 100px; // Để không bị che bởi header fixed
+    
+    .gift-finder-header {
+        .gift-finder-title {
+            color: var(--toy-dark);
+            font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+            
+            &:after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 25%;
+                width: 50%;
+                height: 4px;
+                background: linear-gradient(90deg, var(--toy-primary), var(--toy-secondary), var(--toy-accent));
+                border-radius: 10px;
+            }
+        }
+        
+        .gift-finder-subtitle {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+    }
+    
+    .gift-finder-steps {
+        margin: 0 auto;
+        max-width: 800px;
+        
+        .ant-steps-item-title {
+            font-weight: 600;
+            font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+        }
+        
+        .ant-steps-item-active .ant-steps-item-icon {
+            background-color: var(--toy-primary);
+            border-color: var(--toy-primary);
+        }
+        
+        .ant-steps-item-finish .ant-steps-item-icon {
+            background-color: var(--toy-secondary);
+            border-color: var(--toy-secondary);
+        }
+        
+        .ant-steps-item-finish .ant-steps-item-tail::after {
+            background-color: var(--toy-secondary);
+        }
+    }
+    
+    .gift-finder-card {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 50px;
+        
+        .ant-card-body {
+            padding: 30px;
+        }
+        
+        .step-title {
+            color: var(--toy-dark);
+            font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .step-description {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        // Độ tuổi
+        .age-selection {
+            .age-card {
+                border-radius: 15px;
+                height: 100%;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+                
+                &:hover {
+                    border-color: var(--toy-secondary);
+                    transform: translateY(-5px);
+                }
+                
+                &.selected {
+                    border-color: var(--toy-primary);
+                    background-color: rgba(255, 107, 107, 0.05);
+                    transform: translateY(-5px);
+                }
+                
+                .age-icon {
+                    font-size: 32px;
+                    color: var(--toy-primary);
+                    margin-bottom: 10px;
+                }
+                
+                .age-label {
+                    font-weight: 600;
+                    font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+                }
+            }
+        }
+        
+        // Dịp tặng quà
+        .occasion-selection {
+            .occasion-card {
+                border-radius: 15px;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+                
+                &:hover {
+                    border-color: var(--toy-secondary);
+                    transform: translateY(-5px);
+                }
+                
+                &.selected {
+                    border-color: var(--toy-primary);
+                    background-color: rgba(255, 107, 107, 0.05);
+                    transform: translateY(-5px);
+                }
+                
+                .occasion-icon {
+                    font-size: 24px;
+                    color: var(--toy-primary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background-color: rgba(255, 107, 107, 0.1);
+                    border-radius: 50%;
+                }
+                
+                .occasion-label {
+                    font-weight: 600;
+                    font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+                }
+            }
+        }
+        
+        // Sở thích
+        .interests-selection {
+            .ant-select {
+                .ant-select-selector {
+                    border-radius: 10px;
+                    border: 2px solid #eee;
+                    padding: 5px 10px;
+                    min-height: 50px;
+                    
+                    &:hover {
+                        border-color: var(--toy-secondary);
+                    }
+                }
+                
+                &.ant-select-focused .ant-select-selector {
+                    border-color: var(--toy-primary) !important;
+                    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+                }
+                
+                .ant-select-selection-item {
+                    background-color: rgba(255, 107, 107, 0.1);
+                    border-color: var(--toy-primary);
+                    color: var(--toy-dark);
+                    border-radius: 5px;
+                }
+            }
+        }
+        
+        // Giới tính
+        .gender-selection {
+            h5 {
+                font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+                color: var(--toy-dark);
+                margin-bottom: 15px;
+            }
+            
+            .ant-radio-wrapper {
+                margin-right: 20px;
+                font-size: 16px;
+                
+                .ant-radio-checked .ant-radio-inner {
+                    border-color: var(--toy-primary);
+                    background-color: var(--toy-primary);
+                }
+            }
+        }
+        
+        // Ngân sách
+        .budget-selection {
+            padding: 0 10px;
+            
+            .ant-slider-track {
+                background-color: var(--toy-primary);
+            }
+            
+            .ant-slider-handle {
+                border-color: var(--toy-primary);
+                
+                &:focus {
+                    box-shadow: 0 0 0 5px rgba(255, 107, 107, 0.2);
+                }
+            }
+        }
+        
+        // Buttons
+        .ant-btn-primary {
+            background-color: var(--toy-primary);
+            border-color: var(--toy-primary);
+            border-radius: 30px;
+            padding: 5px 25px;
+            height: auto;
+            font-weight: 600;
+            
+            &:hover {
+                background-color: darken(#FF6B6B, 10%);
+                border-color: darken(#FF6B6B, 10%);
+                transform: translateY(-2px);
+            }
+        }
+        
+        .ant-btn-default {
+            border-radius: 30px;
+            padding: 5px 25px;
+            height: auto;
+            
+            &:hover:not([disabled]) {
+                color: var(--toy-primary);
+                border-color: var(--toy-primary);
+                transform: translateY(-2px);
+            }
+        }
+    }
+} 
