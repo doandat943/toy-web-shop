@@ -39,9 +39,25 @@ const AboutUs = () => {
                 <meta name="description" content="Thông tin về cửa hàng đồ chơi của chúng tôi" />
             </Head>
 
-            <div className="banner" style={{ backgroundImage: `url(${aboutInfo?.banner_image || '/images/default-banner.jpg'})` }}>
+            <div className="banner" style={{ 
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://kalotoys.vn/img/home/banner-6.webp')`,
+                height: '400px',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative'
+            }}>
                 <div className="container">
-                    <h1 className="banner-title">{aboutInfo?.title || 'Về Chúng Tôi'}</h1>
+                    <h1 className="banner-title" style={{
+                        color: 'white',
+                        fontSize: '48px',
+                        fontWeight: 'bold',
+                        position: 'relative',
+                        zIndex: 1,
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                        fontFamily: "'Comic Sans MS', cursive"
+                    }}>{aboutInfo?.title || 'Về Chúng Tôi'}</h1>
                 </div>
             </div>
 

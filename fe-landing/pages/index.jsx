@@ -7,6 +7,7 @@ import queries from '@/queries';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/helpers/format';
 import ProductItem from '@/components/collectionPage/productItem';
+import { useRouter } from 'next/router';
 
 // Sample toy product images for categories
 const toyImages = [
@@ -30,6 +31,7 @@ export default function HomePage() {
     });
     
     const [products, setProducts] = useState([]);
+    const router = useRouter();
 
     useEffect(() => {
         if (productsData?.data && productsData.data.length > 0) {
@@ -185,12 +187,13 @@ export default function HomePage() {
         <div className="homepage">
             {/* Main slider */}
             <div className="main-banner">
-                <Slider />
                 <div className="promo-banner">
-                    <h2>VUI ĐÙA MỖI NGÀY</h2>
-                    <h3>CHỌN ĐỒ CHƠI LIỀN TAY</h3>
-                    <div className="discount-badge">-25%</div>
-                    <button className="shop-now-btn">MUA NGAY</button>
+                    <h2>Thế Giới Đồ Chơi</h2>
+                    <h3>Khám Phá Niềm Vui</h3>
+                    <div className="discount-badge">Giảm giá lên đến 30%</div>
+                    <button className="shop-now-btn" onClick={() => router.push('/collections')}>
+                        Mua Ngay
+                    </button>
                 </div>
             </div>
 

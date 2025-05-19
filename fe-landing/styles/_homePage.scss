@@ -263,6 +263,12 @@
     .main-banner {
         position: relative;
         margin-bottom: 2rem;
+        background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('https://kalotoys.vn/img/home/banner-6.webp');
+        background-size: cover;
+        background-position: center;
+        height: 500px;
+        display: flex;
+        align-items: center;
 
         .promo-banner {
             position: absolute;
@@ -270,54 +276,60 @@
             left: 10%;
             transform: translateY(-50%);
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-width: 450px;
             
             h2 {
-                font-size: 32px;
-                font-weight: 700;
-                color: var(--primary-color);
-                margin-bottom: 10px;
+                font-size: 36px;
+                font-weight: 800;
+                color: #FF6B6B;
+                margin-bottom: 15px;
                 text-transform: uppercase;
+                font-family: 'Comic Sans MS', cursive;
             }
             
             h3 {
                 font-size: 24px;
                 font-weight: 600;
-                color: var(--text-color);
+                color: #4A4A4A;
                 margin-bottom: 20px;
-                text-transform: uppercase;
+                font-family: 'Comic Sans MS', cursive;
             }
             
             .discount-badge {
-                background-color: var(--accent-color);
+                background-color: #4ECDC4;
                 color: white;
                 display: inline-block;
-                padding: 5px 15px;
-                border-radius: 20px;
-                font-size: 20px;
+                padding: 8px 20px;
+                border-radius: 25px;
+                font-size: 22px;
                 font-weight: 700;
-                margin-bottom: 20px;
+                margin-bottom: 25px;
+                font-family: 'Comic Sans MS', cursive;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             }
             
             .shop-now-btn {
-                background-color: var(--primary-color);
+                background-color: #FF6B6B;
                 color: white;
                 border: none;
-                padding: 10px 30px;
-                border-radius: 25px;
-                font-size: 16px;
+                padding: 12px 35px;
+                border-radius: 30px;
+                font-size: 18px;
                 font-weight: 600;
                 cursor: pointer;
                 transition: all 0.3s ease;
                 text-transform: uppercase;
+                font-family: 'Comic Sans MS', cursive;
+                box-shadow: 0 4px 15px rgba(255,107,107,0.3);
                 
                 &:hover {
-                    background-color: darken(#1976d2, 10%);
-                    transform: translateY(-2px);
+                    background-color: darken(#FF6B6B, 10%);
+                    transform: translateY(-3px);
+                    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
                 }
             }
         }
