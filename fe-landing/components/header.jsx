@@ -3,9 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { FaAngleDown, FaShoppingBag } from 'react-icons/fa';
+import { FaAngleDown, FaShoppingBag, FaChild, FaGift, FaBirthdayCake, FaQuestionCircle } from 'react-icons/fa';
 
-import logo from '@/public/img/logo.png';
+import logo from '@/public/img/logo-toyshop.png';
 import queries from '@/queries';
 import customerService from '@/services/customerService';
 import useCustomerStore from '@/store/customerStore';
@@ -30,7 +30,7 @@ const Header = () => {
     };
 
     return (
-        <div className="header-wrapper position-relation">
+        <div className="header-wrapper position-relation toy-header">
             {!isLoggedIn && (
                 <>
                     <div className={!isLogInOpen ? `${'d-none'}` : ''}>
@@ -53,16 +53,49 @@ const Header = () => {
                     </div>
                 </>
             )}
+            
+            {/* Thông báo top */}
+            <div className="toy-announcement">
+                <div className="container">
+                    <p>🎁 Freeship cho đơn hàng từ 500K! Quà tặng đặc biệt cho bé khi mua 2 sản phẩm trở lên</p>
+                </div>
+            </div>
+            
             <div className="header w-100 d-flex align-items-center">
                 <div className="logo-box p-2">
                     <Link href="/">
-                        <Image className="logo" src={logo} alt="" />
+                        <Image className="logo" src={logo} alt="KidsToyLand - Đồ chơi an toàn cho bé" width={150} height={60} />
                     </Link>
                 </div>
                 <ul className="menu p-2">
                     <li className="menu-item fw-bold text-uppercase position-relative">
                         <Link href="/collections" className="d-flex align-items-center">
-                            Tất cả
+                            <FaChild className="menu-icon" /> Tất cả đồ chơi
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/collections?age=infant" className="d-flex align-items-center">
+                            0-1 tuổi
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/collections?age=toddler" className="d-flex align-items-center">
+                            1-3 tuổi
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/collections?age=preschool" className="d-flex align-items-center">
+                            3-6 tuổi
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/collections?age=school" className="d-flex align-items-center">
+                            6-12 tuổi
+                        </Link>
+                    </li>
+                    <li className="menu-item fw-bold text-uppercase position-relative">
+                        <Link href="/gift-finder" className="d-flex align-items-center">
+                            <FaGift className="menu-icon" /> Tìm quà
                         </Link>
                     </li>
                     {categoryList &&
@@ -103,6 +136,16 @@ const Header = () => {
                 </ul>
 
                 <ul className="header-inner p-2 ms-auto">
+                    <li className="inner-item menu-item fw-bold">
+                        <Link href="/about-us" className="d-flex align-items-center">
+                            <FaQuestionCircle className="me-1" /> Giới thiệu
+                        </Link>
+                    </li>
+                    <li className="inner-item menu-item fw-bold">
+                        <Link href="/birthday-club" className="d-flex align-items-center">
+                            <FaBirthdayCake className="me-1" /> Sinh nhật
+                        </Link>
+                    </li>
                     {!isLoggedIn ? (
                         <li
                             onClick={() => {
@@ -115,7 +158,7 @@ const Header = () => {
                     ) : (
                         <>
                             <li className="inner-item menu-item fw-bold text-uppercase">
-                                <Link href="/account/infor">Account</Link>
+                                <Link href="/account/infor">Tài khoản</Link>
                             </li>
                             <li
                                 onClick={() => {
@@ -150,7 +193,7 @@ const Header = () => {
                                 }}
                                 className="inner-item menu-item fw-bold text-uppercase"
                             >
-                                <a href="#">Log Out</a>
+                                <a href="#">Đăng xuất</a>
                             </li>
                         </>
                     )}

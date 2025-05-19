@@ -5,7 +5,12 @@ const sequelize = new Sequelize(
 	process.env.DATABASE_NAME,
 	process.env.DATABASE_USERNAME,
 	process.env.DATABASE_PASSWORD,
-	{ host: process.env.DATABASE_HOST, dialect: 'mysql', logging: false }
+	{ 
+		host: process.env.DATABASE_HOST, 
+		port: process.env.DATABASE_PORT || 3306,
+		dialect: 'mysql', 
+		logging: false 
+	}
 );
 
 module.exports = {
@@ -14,12 +19,13 @@ module.exports = {
 		try {
 			const connection = await mysql.createConnection({
 				host: process.env.DATABASE_HOST,
+				port: process.env.DATABASE_PORT || 3306,
 				user: process.env.DATABASE_USERNAME,
 				password: process.env.DATABASE_PASSWORD,
 			});
 
 			await connection.query(
-				'CREATE DATABASE IF NOT EXISTS `clothes-web-shop`'
+				'CREATE DATABASE IF NOT EXISTS `toy-web-shop`'
 			);
 
 			await connection.end();

@@ -116,3 +116,202 @@
         background-color: #1976d2;
     }
 }
+
+// Toy Shop homepage styles
+.toy-shop {
+    // Màu sắc chủ đạo cho toy shop
+    --toy-primary: #FF6B6B;
+    --toy-secondary: #4ECDC4;
+    --toy-accent: #FFD166;
+    --toy-dark: #1A535C;
+    --toy-light: #F7FFF7;
+    
+    // Typography
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive;
+    }
+    
+    .toy-title {
+        color: var(--toy-dark);
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+        margin: 0 auto 30px;
+        
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--toy-primary), var(--toy-secondary), var(--toy-accent));
+            border-radius: 10px;
+        }
+    }
+    
+    // Danh mục nổi bật
+    .featured-categories {
+        margin-top: 50px;
+        
+        .category-card {
+            display: block;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: var(--toy-light);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--toy-dark);
+            height: 100%;
+            
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            }
+            
+            .category-icon {
+                font-size: 40px;
+                margin-bottom: 15px;
+                color: var(--toy-primary);
+                
+                svg {
+                    font-size: 50px;
+                }
+            }
+            
+            h4 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                color: var(--toy-dark);
+            }
+            
+            p {
+                font-size: 0.9rem;
+                color: #666;
+            }
+        }
+        
+        .col-md-3:nth-child(1) .category-card {
+            border-top: 5px solid var(--toy-primary);
+            .category-icon { color: var(--toy-primary); }
+        }
+        
+        .col-md-3:nth-child(2) .category-card {
+            border-top: 5px solid var(--toy-secondary);
+            .category-icon { color: var(--toy-secondary); }
+        }
+        
+        .col-md-3:nth-child(3) .category-card {
+            border-top: 5px solid var(--toy-accent);
+            .category-icon { color: var(--toy-accent); }
+        }
+        
+        .col-md-3:nth-child(4) .category-card {
+            border-top: 5px solid var(--toy-dark);
+            .category-icon { color: var(--toy-dark); }
+        }
+    }
+    
+    // Banner chính
+    .homepage-featured {
+        .homepage-featured-left {
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #FF9671, #FF6B6B);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            
+            h2 {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+                color: white;
+                line-height: 1.2;
+            }
+            
+            p {
+                margin-bottom: 30px;
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 10px 25px;
+                border-radius: 30px;
+                font-weight: bold;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                
+                &:hover {
+                    transform: scale(1.05);
+                }
+            }
+        }
+    }
+    
+    // Danh mục đồ chơi theo loại
+    .toy-categories {
+        .toy-category-card {
+            margin-bottom: 30px;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            
+            .toy-category-content {
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 20px;
+                background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+                color: white;
+                border-radius: 0 0 15px 15px;
+                
+                h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 10px;
+                }
+                
+                p {
+                    margin-bottom: 15px;
+                }
+                
+                .btn {
+                    border-radius: 30px;
+                    padding: 8px 20px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+    
+    // Giá trị đồ chơi
+    .toy-values {
+        .value-card {
+            padding: 30px 20px;
+            border-radius: 15px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .value-icon {
+                margin-bottom: 20px;
+            }
+            
+            h4 {
+                margin-bottom: 15px;
+                color: var(--toy-dark);
+            }
+            
+            p {
+                color: #666;
+                line-height: 1.6;
+            }
+        }
+    }
+}
