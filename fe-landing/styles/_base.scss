@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +7,7 @@
 }
 
 body {
-    font-family: Pangea, sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
@@ -19,6 +21,16 @@ body {
     --white: white;
     --black: #000;
     --height-input-on-search: 40px;
+    --font-family: 'Quicksand', sans-serif;
+    
+    /* MyKingdom colors */
+    --mk-red: #d11f34;
+    --mk-blue: #006cb7;
+    --mk-yellow: #ffd500;
+    --mk-green: #00a651;
+    --mk-light-gray: #f8f8f8;
+    --mk-dark-gray: #333333;
+    --mk-border-color: #e5e5e5;
 }
 
 .border-radius {
