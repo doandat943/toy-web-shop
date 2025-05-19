@@ -131,6 +131,7 @@ const CartPage = () => {
     );
 };
 
-CartPage.isAuth = true;
+// Remove authentication requirement to allow anyone to view the cart
+// CartPage.isAuth = true;
 
 export default CartPage;

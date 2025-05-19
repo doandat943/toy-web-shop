@@ -10,6 +10,7 @@ import logo from '@/public/img/logo.png';
 import queries from '@/queries';
 import customerService from '@/services/customerService';
 import useCustomerStore from '@/store/customerStore';
+import useCartStore from '@/store/cartStore';
 import Login from './login';
 import Register from './register';
 import { homeAPI } from '@/config';
@@ -22,6 +23,10 @@ const Header = () => {
     const setCustomerLogout = useCustomerStore((state) => state.setCustomerLogout);
     const [websiteInfo, setWebsiteInfo] = useState(null);
     const [websiteLogo, setWebsiteLogo] = useState(logo);
+    
+    // Get cart items from cart store
+    const cartItems = useCartStore((state) => state.productList);
+    const cartItemCount = cartItems.length;
 
     // Fetch website info
     useEffect(() => {
@@ -196,7 +201,7 @@ const Header = () => {
                         <div className="col-md-3 text-end">
                             <Link href="/cart" className="cart-icon">
                                 <FaShoppingBag />
-                                <span className="cart-count">0</span>
+                                <span className="cart-count">{cartItemCount}</span>
                             </Link>
                         </div>
                     </div>

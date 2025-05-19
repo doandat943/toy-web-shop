@@ -6,6 +6,259 @@
     --text-color: #333333;
     --light-bg: #f8f9fa;
 
+    // Hero section styles
+    .hero-section {
+        padding: 60px 0;
+        background-color: #f9f9f9;
+        background-image: url('/img/homepage/pattern-bg.png');
+        background-size: cover;
+        margin-bottom: 40px;
+
+        .hero-content {
+            padding-right: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            
+            .hero-title {
+                font-size: 42px;
+                font-weight: 700;
+                margin-bottom: 15px;
+                color: #333;
+                
+                .highlight {
+                    color: var(--primary-color);
+                    position: relative;
+                    
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        width: 110%;
+                        height: 8px;
+                        background-color: rgba(25, 118, 210, 0.2);
+                        bottom: 5px;
+                        left: -5%;
+                        z-index: -1;
+                    }
+                }
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+                margin-bottom: 30px;
+                color: #555;
+            }
+            
+            .hero-cta {
+                display: flex;
+                gap: 15px;
+                margin-top: 15px;
+                
+                .btn-primary {
+                    background-color: var(--primary-color);
+                    color: white;
+                    font-weight: 600;
+                    padding: 12px 25px;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    display: inline-block;
+                    
+                    &:hover {
+                        background-color: darken(#1976d2, 10%);
+                        transform: translateY(-3px);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    }
+                }
+                
+                .btn-outline {
+                    border: 2px solid var(--primary-color);
+                    color: var(--primary-color);
+                    font-weight: 600;
+                    padding: 11px 25px;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    display: inline-block;
+                    
+                    &:hover {
+                        background-color: var(--primary-color);
+                        color: white;
+                        transform: translateY(-3px);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    }
+                }
+            }
+        }
+        
+        .hero-image {
+            img {
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                object-fit: cover;
+            }
+        }
+    }
+    
+    // Trust banner
+    .trust-banner {
+        margin-bottom: 40px;
+        
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    }
+    
+    // Product category sections
+    .product-category-section {
+        margin-bottom: 50px;
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            
+            .section-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--primary-color);
+                margin: 0;
+            }
+            
+            .view-all-btn {
+                color: var(--primary-color);
+                font-weight: 600;
+                text-decoration: none;
+                
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+    
+    // Features section
+    .features-section {
+        margin-bottom: 60px;
+        
+        h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+        
+        .feature-item {
+            margin-bottom: 30px;
+            
+            a {
+                text-decoration: none;
+                color: var(--text-color);
+                display: block;
+                transition: all 0.3s ease;
+                
+                &:hover {
+                    transform: translateY(-5px);
+                    
+                    .feature-title {
+                        color: var(--primary-color);
+                    }
+                }
+            }
+            
+            .feature-icon {
+                width: 70px;
+                height: 70px;
+                margin: 0 auto 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #f0f7ff;
+                border-radius: 50%;
+            }
+            
+            .feature-title {
+                font-weight: 600;
+                font-size: 16px;
+            }
+        }
+    }
+    
+    // Testimonials section
+    .testimonials-section {
+        margin-bottom: 60px;
+        
+        h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        
+        .testimonial-item {
+            
+            .testimonial-logo {
+                background-color: #f5f5f5;
+                border-radius: 50%;
+                width: 80px;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                font-size: 14px;
+                color: #777;
+            }
+        }
+    }
+    
+    // Benefits section
+    .benefits-section {
+        padding: 60px 0;
+        
+        h2 {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+        
+        .benefit-item {
+            margin-bottom: 30px;
+            
+            .benefit-icon {
+                margin-bottom: 15px;
+            }
+            
+            .benefit-title {
+                font-weight: 600;
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            
+            .benefit-desc {
+                color: #666;
+                font-size: 14px;
+            }
+        }
+    }
+    
+    // Responsive styles
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 40px 0;
+            
+            .hero-content {
+                padding-right: 0;
+                margin-bottom: 30px;
+                
+                .hero-title {
+                    font-size: 32px;
+                }
+            }
+        }
+    }
+
     // Main banner section
     .main-banner {
         position: relative;
@@ -78,7 +331,7 @@
             position: relative;
             font-size: 24px;
             font-weight: 600;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             
             &:after {
                 content: '';
@@ -88,6 +341,13 @@
                 background-color: var(--primary-color);
                 margin: 10px auto 0;
             }
+        }
+        
+        .section-description {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 25px;
+            text-align: center;
         }
         
         .view-all-btn {
@@ -214,6 +474,26 @@
                     }
                 }
             }
+        }
+    }
+
+    // Product section specific styles
+    .product-section {
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            
+            &:after {
+                display: none;
+            }
+        }
+        
+        .section-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: left;
         }
     }
 

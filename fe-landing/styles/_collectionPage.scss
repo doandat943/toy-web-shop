@@ -1,0 +1,233 @@
+.collection-page {
+    padding-bottom: 40px;
+
+    // Breadcrumb styling
+    .ant-breadcrumb {
+        font-size: 14px;
+        
+        a {
+            color: #666;
+            
+            &:hover {
+                color: #1976d2;
+            }
+        }
+        
+        .ant-breadcrumb-separator {
+            margin: 0 8px;
+        }
+        
+        .ant-breadcrumb-link {
+            color: #333;
+        }
+    }
+    
+    // Collection header
+    .collection-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        
+        .collection-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .collection-description {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+    }
+    
+    // Filter section
+    .filter-section {
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        
+        .filter-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        // Age filter radio buttons
+        .age-filter {
+            .ant-radio-button-wrapper {
+                border-color: #1976d2;
+                color: #1976d2;
+                
+                &:first-child {
+                    border-radius: 4px 0 0 4px;
+                }
+                
+                &:last-child {
+                    border-radius: 0 4px 4px 0;
+                }
+                
+                &:hover {
+                    color: #1976d2;
+                    background-color: rgba(25, 118, 210, 0.05);
+                }
+                
+                &.ant-radio-button-wrapper-checked {
+                    background-color: #1976d2;
+                    border-color: #1976d2;
+                    color: white;
+                    
+                    &::before {
+                        background-color: #1976d2;
+                    }
+                }
+            }
+        }
+        
+        // Sort select dropdown
+        .ant-select {
+            .ant-select-selector {
+                border-color: #1976d2;
+                border-radius: 4px;
+            }
+            
+            &.ant-select-focused .ant-select-selector {
+                border-color: #1976d2;
+                box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+            }
+            
+            .ant-select-arrow {
+                color: #1976d2;
+            }
+        }
+    }
+    
+    // Product grid layout
+    .product-list {
+        margin-top: 20px;
+    }
+    
+    // Empty state
+    .ant-empty {
+        padding: 40px 0;
+        
+        .ant-empty-image {
+            height: 100px;
+        }
+        
+        .ant-empty-description {
+            color: #666;
+            font-size: 16px;
+        }
+    }
+    
+    // Benefits section
+    .benefits-section {
+        margin-top: 60px;
+        padding-top: 40px;
+        border-top: 1px solid #eee;
+        
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 30px;
+            position: relative;
+            
+            &:after {
+                content: '';
+                position: absolute;
+                width: 60px;
+                height: 3px;
+                background-color: #1976d2;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        
+        .benefit-item {
+            background-color: #f8f9fa;
+            padding: 25px 15px;
+            border-radius: 10px;
+            height: 100%;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .benefit-icon {
+                img {
+                    width: 60px;
+                    height: 60px;
+                    object-fit: contain;
+                }
+            }
+            
+            .benefit-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #1976d2;
+            }
+            
+            .benefit-description {
+                font-size: 14px;
+                color: #666;
+                line-height: 1.6;
+            }
+        }
+        
+        .btn-shop-now {
+            display: inline-block;
+            background-color: #1976d2;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
+            
+            &:hover {
+                background-color: darken(#1976d2, 10%);
+                transform: translateY(-3px);
+                box-shadow: 0 6px 15px rgba(25, 118, 210, 0.4);
+            }
+        }
+    }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+    .collection-page {
+        .collection-header {
+            .collection-title {
+                font-size: 24px;
+            }
+            
+            .collection-description {
+                font-size: 14px;
+            }
+        }
+        
+        .filter-section {
+            .age-filter {
+                .ant-radio-button-wrapper {
+                    padding: 0 10px;
+                    font-size: 12px;
+                }
+            }
+        }
+        
+        .benefits-section {
+            h2 {
+                font-size: 24px;
+            }
+            
+            .benefit-item {
+                margin-bottom: 20px;
+            }
+        }
+    }
+} 

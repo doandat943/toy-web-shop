@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import queries from '@/queries';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/helpers/format';
+import ProductItem from '@/components/collectionPage/productItem';
 
 // Sample toy product images for categories
 const toyImages = [
@@ -17,6 +18,9 @@ const toyImages = [
 
 // Placeholder image for products with missing images
 const placeholderImage = "/img/products/placeholder.jpg";
+
+// Mẫu độ tuổi để hiển thị 
+const AGE_RANGES = ["0-3 tuổi", "1-3 tuổi", "3-4 tuổi", "2-6 tuổi", "2-5 tuổi"];
 
 export default function HomePage() {
     const { data: productsData, isLoading, isError } = useQuery({
@@ -30,7 +34,7 @@ export default function HomePage() {
     useEffect(() => {
         if (productsData?.data && productsData.data.length > 0) {
             // Map products to ensure they have image paths
-            const mappedProducts = productsData.data.map((product) => {
+            const mappedProducts = productsData.data.map((product, index) => {
                 // Try to get image from various possible properties
                 let imagePath = null;
                 
@@ -55,9 +59,18 @@ export default function HomePage() {
                     imagePath = placeholderImage;
                 }
                 
+                // Tính giá gốc (giả sử giá gốc cao hơn 10-40% so với giá hiện tại)
+                const discountPercent = Math.floor(Math.random() * 31) + 10; // 10-40%
+                const oldPrice = product.price ? Math.round(product.price * (100 / (100 - discountPercent))) : null;
+                
+                // Gán độ tuổi ngẫu nhiên
+                const ageRangeIndex = index % AGE_RANGES.length;
+                
                 return {
                     ...product,
-                    display_image: imagePath
+                    display_image: imagePath,
+                    old_price: oldPrice,
+                    age_range: AGE_RANGES[ageRangeIndex]
                 };
             });
             
@@ -68,20 +81,44 @@ export default function HomePage() {
         }
     }, [productsData]);
 
-    // Toy categories with icons
+    // Toy categories with icons and colors
     const toyCategories = [
-        { name: "Đồ chơi mới", icon: <ShoppingOutlined />, href: "/collections" },
-        { name: "Đồ chơi giáo dục", icon: <GiftOutlined />, href: "/collections" },
-        { name: "Đồ chơi phổ biến", icon: <TagOutlined />, href: "/collections" },
-        { name: "Liên hệ chúng tôi", icon: <CustomerServiceOutlined />, href: "/about-us" }
+        { name: "Đồ chơi mới", icon: <ShoppingOutlined />, href: "/collections", bgColor: "#e3f2fd" },
+        { name: "Đồ chơi giáo dục", icon: <GiftOutlined />, href: "/collections", bgColor: "#fff3e0" },
+        { name: "Đồ chơi phổ biến", icon: <TagOutlined />, href: "/collections", bgColor: "#e8f5e9" },
+        { name: "Liên hệ chúng tôi", icon: <CustomerServiceOutlined />, href: "/about-us", bgColor: "#f3e5f5" }
     ];
 
     // Product sections
     const productSections = [
-        { title: "Đồ chơi trí tuệ", href: "/collections", filter: (p, i) => i % 4 === 0 },
-        { title: "Đồ chơi tập nói", href: "/collections", filter: (p, i) => i % 4 === 1 },
-        { title: "Đồ chơi vận động", href: "/collections", filter: (p, i) => i % 4 === 2 },
-        { title: "Sản phẩm nổi bật", href: "/collections", filter: (p, i) => i % 4 === 3 },
+        { 
+            title: "Đồ chơi trí tuệ", 
+            description: "Phát triển tư duy sáng tạo cho bé",
+            href: "/collections", 
+            filter: (p, i) => i % 4 === 0,
+            bgColor: "#e3f2fd" 
+        },
+        { 
+            title: "Đồ chơi tập nói", 
+            description: "Kích thích khả năng ngôn ngữ",
+            href: "/collections", 
+            filter: (p, i) => i % 4 === 1,
+            bgColor: "#fff3e0" 
+        },
+        { 
+            title: "Đồ chơi vận động", 
+            description: "Rèn luyện kỹ năng vận động cho bé",
+            href: "/collections", 
+            filter: (p, i) => i % 4 === 2,
+            bgColor: "#e8f5e9" 
+        },
+        { 
+            title: "Sản phẩm nổi bật", 
+            description: "Được yêu thích nhất tại KaloToys",
+            href: "/collections", 
+            filter: (p, i) => i % 4 === 3,
+            bgColor: "#f3e5f5" 
+        },
     ];
 
     // Benefits
@@ -128,37 +165,19 @@ export default function HomePage() {
             : products.slice(0, 4);
         
         return productsToShow.map((product, index) => (
-            <div className="col-md-3 mb-4" key={index}>
-                <div className="product-card">
-                    <div className="product-image position-relative">
-                        <Link href={`/product/${product.product_id}`}>
-                            <Image 
-                                src={product.display_image}
-                                alt={product.product_name} 
-                                width={250}
-                                height={250}
-                                className="img-fluid"
-                            />
-                        </Link>
-                        <div className="social-icons">
-                            <span className="icon fb">f</span>
-                            <span className="icon insta">i</span>
-                            <span className="icon cart">c</span>
-                        </div>
-                    </div>
-                    <div className="product-info p-2 text-center">
-                        <h5 className="product-title">
-                            <Link href={`/product/${product.product_id}`}>
-                                {product.product_name}
-                            </Link>
-                        </h5>
-                        <div className="product-price">
-                            <span className="price">{formatPrice(product.price)} đ</span>
-                        </div>
-                        <button className="add-to-cart-btn">Thêm vào giỏ</button>
-                    </div>
-                </div>
-            </div>
+            <ProductItem
+                key={`product-${index}-${product.product_id}`}
+                product_id={product.product_id}
+                name={product.product_name}
+                img={product.display_image}
+                price={product.price}
+                old_price={product.old_price}
+                age_range={product.age_range}
+                colour_id={product.colour_id || 0}
+                sizes={product.sizes || []}
+                rating={product.rating || 5}
+                feedback_quantity={product.feedback_quantity || 0}
+            />
         ));
     };
 
@@ -177,21 +196,23 @@ export default function HomePage() {
 
             {/* Featured products section */}
             <div className="featured-products container py-4">
-                <h2 className="section-title text-center mb-4">Đã đặt niềm tin vững chắc vào website</h2>
+                <h2 className="section-title text-center mb-4">Sản phẩm nổi bật</h2>
+                <p className="section-description text-center mb-4">Các sản phẩm được yêu thích nhất tại KaloToys</p>
                 <div className="row">
                     {renderProductContent()}
                 </div>
             </div>
 
             {/* Categories with icons */}
-            <div className="categories-section container-fluid py-4">
+            <div className="categories-section container-fluid py-5">
                 <div className="container">
-                    <h3 className="text-center mb-4">Hội ứng bé - tìm đồ chơi</h3>
+                    <h3 className="text-center mb-2">Hội ứng bé - tìm đồ chơi</h3>
+                    <p className="text-center mb-4">Chọn danh mục đồ chơi phù hợp với độ tuổi và sở thích của bé</p>
                     <div className="row">
                         {toyCategories.map((category, index) => (
-                            <div className="col-md-3 text-center mb-3" key={index}>
+                            <div className="col-md-3 text-center mb-4" key={index}>
                                 <Link href={category.href} className="category-item">
-                                    <div className="category-icon">
+                                    <div className="category-icon" style={{ backgroundColor: category.bgColor }}>
                                         {category.icon}
                                     </div>
                                     <p className="category-name">{category.name}</p>
@@ -203,8 +224,9 @@ export default function HomePage() {
             </div>
 
             {/* Brand logos */}
-            <div className="brands-section container py-3">
-                <h3 className="text-center mb-3">Bằng chứng dẫn</h3>
+            <div className="brands-section container py-4">
+                <h3 className="text-center mb-2">Đối tác của chúng tôi</h3>
+                <p className="text-center mb-4">KaloToys tự hào là đối tác của các thương hiệu đồ chơi uy tín</p>
                 <div className="row">
                     {[1, 2, 3, 4, 5].map((brand) => (
                         <div className="col text-center" key={brand}>
@@ -218,9 +240,16 @@ export default function HomePage() {
 
             {/* Multiple product sections */}
             {productSections.map((section, sectionIndex) => (
-                <div className="product-section container py-4" key={sectionIndex}>
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h3 className="section-title">{section.title}</h3>
+                <div 
+                    className="product-section container py-4 mb-4" 
+                    key={sectionIndex}
+                    style={{ backgroundColor: section.bgColor, borderRadius: '10px', padding: '20px' }}
+                >
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h3 className="section-title">{section.title}</h3>
+                            <p className="section-description">{section.description}</p>
+                        </div>
                         <Link href={section.href} className="view-all-btn">Xem tất cả</Link>
                     </div>
                     <div className="row">
@@ -232,7 +261,7 @@ export default function HomePage() {
             {/* Trust section */}
             <div className="trust-section container-fluid py-5 bg-light">
                 <div className="container">
-                    <h3 className="text-center mb-5">Tự vui hàng chính phúc trẻ giỏi</h3>
+                    <h3 className="text-center mb-3">Đồ chơi an toàn - Phát triển toàn diện</h3>
                     <p className="text-center mb-5">
                         Đồ chơi trẻ em KALO TOYS cung cấp đồ chơi trẻ em nhập khẩu chính hãng <br/>
                         Đủ tiêu chuẩn an toàn cho bé yêu, kích thích phát triển trí tuệ, cảm quan, vận động
@@ -244,8 +273,8 @@ export default function HomePage() {
                                     <Image 
                                         src={benefit.icon} 
                                         alt={benefit.title} 
-                                        width={50}
-                                        height={50}
+                                        width={60}
+                                        height={60}
                                         className="img-fluid"
                                     />
                                 </div>

@@ -1,5 +1,8 @@
 const Category = require('../models/category');
 const Product = require('../models/product');
+const Product_Variant = require('../models/product_variant');
+const Product_Image = require('../models/product_image');
+const Product_Price_History = require('../models/product_price_history');
 const { Op } = require('sequelize');
 
 let createLevel1 = async (req, res, next) => {
@@ -165,6 +168,95 @@ let listLevel1 = async (req, res, next) => {
     }
 }
 
+let getNestList = async (req, res, next) => {
+    try {
+        let categories = await Category.findAll({
+            where: { state: true },
+            include: { model: Category, as: 'children', where: { state: true }, required: false }
+        });
+        let result = [];
+        for (let category of categories) {
+            if (category.parent_id === null) {
+                let children = [];
+                for (let child of categories) {
+                    if (child.parent_id === category.category_id) {
+                        children.push({
+                            category_id: child.category_id,
+                            category_name: child.category_name,
+                            category_slug: child.category_slug,
+                            icon: child.icon || null,
+                            age_range: child.age_range || null,
+                            background_color: child.background_color || null
+                        });
+                    }
+                }
+                result.push({
+                    category_id: category.category_id,
+                    category_name: category.category_name,
+                    category_slug: category.category_slug,
+                    icon: category.icon || null,
+                    age_range: category.age_range || null,
+                    background_color: category.background_color || null,
+                    children: children
+                });
+            }
+        }
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+    }
+}
+
+let listAll = async (req, res, next) => {
+    try {
+        let categories = await Category.findAll({
+            where: { state: true },
+            attributes: [
+                'category_id',
+                'category_name',
+                'category_slug',
+                'icon',
+                'age_range',
+                'background_color',
+                'parent_id',
+                'order',
+                'state'
+            ]
+        });
+        return res.send(categories);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+    }
+}
+
+let create = async (req, res, next) => {
+    try {
+        let category_name = req.body.category_name;
+        if (category_name === undefined) return res.status(400).send('Trường category_name không tồn tại');
+        let category_slug = req.body.category_slug;
+        if (category_slug === undefined) return res.status(400).send('Trường category_slug không tồn tại');
+        let icon = req.body.icon;
+        let age_range = req.body.age_range;
+        let background_color = req.body.background_color;
+        let parent_id = req.body.parent_id;
+        
+        let category = await Category.create({
+            category_name,
+            category_slug,
+            icon,
+            age_range,
+            background_color,
+            parent_id
+        });
+        return res.send(category);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Gặp lỗi khi tải dữ liệu vui lòng thử lại');
+    }
+}
+
 module.exports = {
     createLevel1,
     createLevel2,
@@ -172,5 +264,8 @@ module.exports = {
     remove,
     nestList,
     list,
-    listLevel1
+    listLevel1,
+    getNestList,
+    listAll,
+    create
 };
